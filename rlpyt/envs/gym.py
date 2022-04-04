@@ -109,8 +109,12 @@ def build_info_tuples(info, name="info"):
 
 
 def info_to_nt(value, name="info"):
+    # return namedtuple(**value)
     if not isinstance(value, dict):
         return value
+    # if name not in globals():
+    #     build_info_tuples(value, name)
+
     ntc = globals()[name]
     # Disregard unrecognized keys:
     values = {k: info_to_nt(v, "_".join([name, k]))
