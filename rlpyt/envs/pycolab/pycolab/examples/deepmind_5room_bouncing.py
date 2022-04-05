@@ -81,6 +81,7 @@ MAZES_ART = [
 
 # These colours are only for humans to see in the CursesUi.
 COLOUR_FG = {' ': (0, 0, 0),        # Default black background
+             '@': (999, 862, 110),  # Shimmering golden coins
              '#': (764, 0, 999),    # Walls of the maze
              'P': (0, 999, 999),    # This is you, the player
              'a': (999, 0, 780),    # Patroller A

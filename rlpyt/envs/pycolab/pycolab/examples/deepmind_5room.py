@@ -80,11 +80,20 @@ MAZES_ART = [
 ]
 
 # These colours are only for humans to see in the CursesUi.
+# COLOUR_FG = {' ': (0, 0, 0),        # Default black background
+#              '#': (764, 0, 999),    # Walls of the maze
+#              'P': (0, 999, 999),    # This is you, the player
+#              'a': (999, 0, 780),    # Patroller A
+#              'b': (145, 987, 341)}  # Patroller B
 COLOUR_FG = {' ': (0, 0, 0),        # Default black background
+             '@': (999, 862, 110),  # Shimmering golden coins
              '#': (764, 0, 999),    # Walls of the maze
              'P': (0, 999, 999),    # This is you, the player
              'a': (999, 0, 780),    # Patroller A
-             'b': (145, 987, 341)}  # Patroller B
+             'b': (145, 987, 341),  # Patroller B
+             'c': (987, 623, 145),  # Patroller C
+             'd': (987, 623, 145),  # Patroller D
+             'e': (987, 623, 145)}  # Patroller E
 
 COLOUR_BG = {'@': (0, 0, 0)}  # So the coins look like @ and not solid blocks.
 
