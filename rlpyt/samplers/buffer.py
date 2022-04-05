@@ -10,7 +10,7 @@ from rlpyt.samplers.collections import (Samples, AgentSamples, AgentSamplesBsv, 
 
 
 def build_samples_buffer(agent, env, batch_spec, bootstrap_value=False,
-        agent_shared=True, env_shared=True, subprocess=True, examples=None):
+        agent_shared=True, env_shared=True, subprocess=False, examples=None):
     """Recommended to step/reset agent and env in subprocess, so it doesn't
     affect settings in master before forking workers (e.g. torch num_threads
     (MKL) may be set at first forward computation.)"""
