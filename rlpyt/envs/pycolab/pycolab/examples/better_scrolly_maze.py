@@ -287,7 +287,7 @@ def make_croppers(level):
   return [
       # The player view.
       cropping.ScrollingCropper(rows=10, cols=30, to_track=['P'],
-                                initial_offset=STARTER_OFFSET[level]),
+                                initial_offset=STARTER_OFFSET[level], scroll_margins=(2, 3)),
       # The patroller view.
       cropping.ScrollingCropper(rows=7, cols=10, to_track=['c'],
                                 pad_char=' ', scroll_margins=(None, 3)),

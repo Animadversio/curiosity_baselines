@@ -272,7 +272,7 @@ class ScrollingCropper(ObservationCropper):
   """A cropper that scrolls to track moving game entities."""
 
   def __init__(self, rows, cols, to_track, pad_char=None,
-               scroll_margins=(2, 3), initial_offset=None, saccade=True):
+               scroll_margins=(None, None), initial_offset=None, saccade=True):
     """Initialise a `ScrollingCropper`.
 
     A `ScrollingCropper` does its best to slide fixed-size cropping windows
