@@ -175,6 +175,7 @@ def start_experiment(args):
         model_args['curiosity_kwargs']['drop_probability'] = args.drop_probability
         model_args['curiosity_kwargs']['gamma'] = args.discount
         model_args['curiosity_kwargs']['device'] = args.sample_mode
+        model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
 
     if args.env in _MUJOCO_ENVS:
         if args.lstm:

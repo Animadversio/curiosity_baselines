@@ -29,46 +29,59 @@ class RND(nn.Module):
         self.prediction_beta = prediction_beta
         self.drop_probability = drop_probability
         self.device = torch.device('cuda:0' if device == 'gpu' else 'cpu')
+        if image_shape == (4, 5, 5):
+            self.small_image = True
+            c, h, w = image_shape
+            encoder = MazeHead(image_shape)
+            self.feature_size = encoder.output_size
+            self.conv_feature_size = encoder.conv_output_size
+            self.forward_model = encoder.model
+            encoder2 = MazeHead(image_shape)
+            self.target_model = encoder2.model
+            self.obs_rms = RunningMeanStd(shape=(1, c, h, w)) # (T, B, c, h, w)
+            self.rew_rms = RunningMeanStd()
+            self.rew_rff = RewardForwardFilter(gamma)
+        else:
+            self.small_image = False
+            c, h, w = 1, image_shape[1], image_shape[2] # assuming grayscale inputs
+            self.obs_rms = RunningMeanStd(shape=(1, c, h, w)) # (T, B, c, h, w)
+            self.rew_rms = RunningMeanStd()
+            self.rew_rff = RewardForwardFilter(gamma)
+            self.feature_size = 512
+            self.conv_feature_size = 7*7*64
 
-        c, h, w = 1, image_shape[1], image_shape[2] # assuming grayscale inputs
-        self.obs_rms = RunningMeanStd(shape=(1, c, h, w)) # (T, B, c, h, w)
-        self.rew_rms = RunningMeanStd()
-        self.rew_rff = RewardForwardFilter(gamma)
-        self.feature_size = 512
-        self.conv_feature_size = 7*7*64
+            # Learned predictor model
+            # self.forward_model = nn.Sequential(nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
+            #                                    nn.LeakyReLU(),
+            #                                    nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
+            #                                    nn.LeakyReLU(),
+            #                                    nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
+            #                                    nn.LeakyReLU(),
+            #                                    Flatten(),
+            #                                    nn.Linear(self.conv_feature_size, self.feature_size),
+            #                                    nn.ReLU(),
+            #                                    nn.Linear(self.feature_size, self.feature_size),
+            #                                    nn.ReLU(),
+            #                                    nn.Linear(self.feature_size, self.feature_size))
+            # Fixed weight target model
+            # self.target_model = nn.Sequential(nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
+            #                                   nn.LeakyReLU(),
+            #                                   nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
+            #                                   nn.LeakyReLU(),
+            #                                   nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
+            #                                   nn.LeakyReLU(),
+            #                                   Flatten(),
+            #                                   nn.Linear(self.conv_feature_size, self.feature_size))
 
-        # Learned predictor model
-        # self.forward_model = nn.Sequential(nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
-        #                                    nn.LeakyReLU(),
-        #                                    nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-        #                                    nn.LeakyReLU(),
-        #                                    nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-        #                                    nn.LeakyReLU(),
-        #                                    Flatten(),
-        #                                    nn.Linear(self.conv_feature_size, self.feature_size),
-        #                                    nn.ReLU(),
-        #                                    nn.Linear(self.feature_size, self.feature_size),
-        #                                    nn.ReLU(),
-        #                                    nn.Linear(self.feature_size, self.feature_size))
-
-        self.forward_model = nn.Sequential(
+            self.forward_model = nn.Sequential(
                                             nn.Conv2d(
-                                                in_channels=1,
-                                                out_channels=32,
-                                                kernel_size=8,
-                                                stride=4),
+                                                in_channels=1, out_channels=32, kernel_size=8, stride=4),
                                             nn.LeakyReLU(),
                                             nn.Conv2d(
-                                                in_channels=32,
-                                                out_channels=64,
-                                                kernel_size=4,
-                                                stride=2),
+                                                in_channels=32, out_channels=64, kernel_size=4, stride=2),
                                             nn.LeakyReLU(),
                                             nn.Conv2d(
-                                                in_channels=64,
-                                                out_channels=64,
-                                                kernel_size=3,
-                                                stride=1),
+                                                in_channels=64, out_channels=64, kernel_size=3, stride=1),
                                             nn.LeakyReLU(),
                                             Flatten(),
                                             nn.Linear(self.conv_feature_size, self.feature_size),
@@ -77,44 +90,24 @@ class RND(nn.Module):
                                             nn.ReLU(),
                                             nn.Linear(self.feature_size, self.feature_size)
                                             )
+            self.target_model = nn.Sequential(
+                nn.Conv2d(
+                    in_channels=1, out_channels=32, kernel_size=8, stride=4),
+                nn.LeakyReLU(),
+                nn.Conv2d(
+                    in_channels=32, out_channels=64, kernel_size=4, stride=2),
+                nn.LeakyReLU(),
+                nn.Conv2d(
+                    in_channels=64, out_channels=64, kernel_size=3, stride=1),
+                nn.LeakyReLU(),
+                Flatten(),
+                nn.Linear(self.conv_feature_size, self.feature_size)
+            )
 
         for param in self.forward_model:
             if isinstance(param, nn.Conv2d) or isinstance(param, nn.Linear):
                 nn.init.orthogonal_(param.weight, np.sqrt(2))
                 param.bias.data.zero_()
-
-        # Fixed weight target model
-        # self.target_model = nn.Sequential(nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
-        #                                   nn.LeakyReLU(),
-        #                                   nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-        #                                   nn.LeakyReLU(),
-        #                                   nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-        #                                   nn.LeakyReLU(),
-        #                                   Flatten(),
-        #                                   nn.Linear(self.conv_feature_size, self.feature_size))
-
-        self.target_model = nn.Sequential(
-                                            nn.Conv2d(
-                                                in_channels=1,
-                                                out_channels=32,
-                                                kernel_size=8,
-                                                stride=4),
-                                            nn.LeakyReLU(),
-                                            nn.Conv2d(
-                                                in_channels=32,
-                                                out_channels=64,
-                                                kernel_size=4,
-                                                stride=2),
-                                            nn.LeakyReLU(),
-                                            nn.Conv2d(
-                                                in_channels=64,
-                                                out_channels=64,
-                                                kernel_size=3,
-                                                stride=1),
-                                            nn.LeakyReLU(),
-                                            Flatten(),
-                                            nn.Linear(self.conv_feature_size, self.feature_size)
-                                        )
 
         for param in self.target_model:
             if isinstance(param, nn.Conv2d) or isinstance(param, nn.Linear):
@@ -127,8 +120,9 @@ class RND(nn.Module):
     def forward(self, obs, done=None):
 
         # in case of frame stacking
-        obs = obs[:,:,-1,:,:]
-        obs = obs.unsqueeze(2)
+        if not obs.shape[2:] == torch.Size([4,5,5]):
+            obs = obs[:,:,-1,:,:]
+            obs = obs.unsqueeze(2)
 
         # img = np.squeeze(obs.data.numpy()[0][0])
         # mean = np.squeeze(self.obs_rms.mean)
