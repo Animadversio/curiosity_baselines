@@ -281,7 +281,28 @@ def start_experiment(args):
             horizon=args.max_episode_steps,
             )
 
-    if args.sample_mode == 'gpu':
+    if args.serial == 1:
+        if args.lstm:
+            collector_class = CpuWaitResetCollector
+        else:
+            collector_class = CpuResetCollector
+        sampler = SerialSampler(
+            EnvCls=env_cl,
+            env_kwargs=env_args,
+            eval_env_kwargs=env_args,
+            batch_T=args.timestep_limit,
+            batch_B=args.num_envs,
+            max_decorrelation_steps=0,
+            TrajInfoCls=traj_info_cl,
+            eval_n_envs=args.eval_envs,
+            eval_max_steps=args.eval_max_steps,
+            eval_max_trajectories=args.eval_max_traj,
+            record_freq=args.record_freq,
+            log_dir=args.log_dir,
+            CollectorCls=collector_class
+        )
+
+    elif args.sample_mode == 'gpu':
         if args.lstm:
             collector_class = GpuWaitResetCollector
         else:
@@ -301,6 +322,7 @@ def start_experiment(args):
             log_dir=args.log_dir,
             CollectorCls=collector_class
         )
+
     else:
         if args.lstm:
             collector_class = CpuWaitResetCollector

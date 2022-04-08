@@ -22,6 +22,7 @@ def get_args(args_in=sys.argv[1:]):
     parser.add_argument('-no_negative_reward', action='store_true', help='Whether or not to use negative rewards (living penalty for example).')
     parser.add_argument('-num_envs', default=4, type=int, help='Number of environments to run in parallel.')
     parser.add_argument('-sample_mode', default='cpu', type=str, help='Whether to use GPU or CPU sampling.')
+    parser.add_argument('-serial', default=0, type=int, help='Whether to use serial sampling mode or parallel multiprocessing.')
     parser.add_argument('-num_gpus', default=0, type=int, help='Number of GPUs available.')
     parser.add_argument('-num_cpus', default=1, type=int, help='Number of CPUs to run worker processes.')
     parser.add_argument('-eval_envs', default=0, type=int, help='Number of evaluation environments per worker process.')
