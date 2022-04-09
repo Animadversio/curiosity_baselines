@@ -163,3 +163,67 @@ def make(*args, info_example=None, **kwargs):
     else:
         return GymEnvWrapper(EnvInfoWrapper(
             gym.make(*args, **kwargs), info_example))
+
+from rlpyt.envs.wrappers.general_wrappers import *
+from rlpyt.envs.wrappers.mario_wrappers import *
+from rlpyt.envs.atari.atari_env import AtariEnv
+
+def atari_make(*args, info_example=None, **kwargs):
+    """Use as factory function for making instances of gym environment with
+    rlpyt's ``GymEnvWrapper``, using ``gym.make(*args, **kwargs)``.  If
+    ``info_example`` is not ``None``, will include the ``EnvInfoWrapper``.
+    """
+    if info_example is None:
+        return GymEnvWrapper(AtariEnv(*args, **kwargs))
+    else:
+        return GymEnvWrapper(EnvInfoWrapper(
+            AtariEnv(*args, **kwargs), info_example))
+
+
+def deepmind_make(*args, info_example=None, **kwargs):
+    """Use as factory function for making instances of Pycolab environments with
+    rlpyt's ``GymEnvWrapper``, using ``gym.make(*args, **kwargs)``. If
+    ``info_example`` is not ``None``, will include the ``EnvInfoWrapper``.
+    """
+    import rlpyt.envs.mazeworld.mazeworld
+
+    env = gym.make(kwargs['game'], obs_type=kwargs['obs_type'], max_iterations=kwargs['max_steps_per_episode'])
+    env.pycolab_init(kwargs['logdir'], kwargs['log_heatmaps'])
+
+    if kwargs['no_negative_reward']:
+        env = NoNegativeReward(env)
+
+    if kwargs['obs_type'] == 'rgb':
+        env = PytorchImage(env)
+
+    if info_example is None:
+        env = GymEnvWrapper(env, act_null_value=env.act_null_value)
+    else:
+        env = GymEnvWrapper(EnvInfoWrapper(env))
+
+    return env
+
+
+def mario_make(*args, info_example=None, **kwargs):
+    """Use as factory function for making instances of SuperMario environments with
+    rlpyt's ``GymEnvWrapper``, using ``gym_super_mario_bros.make(*args, **kwargs)``. If
+    ``info_example`` is not ``None``, will include the ``EnvInfoWrapper``.
+    """
+    import retro
+    import gym_super_mario_bros
+    from nes_py.wrappers import JoypadSpace
+    from gym_super_mario_bros.actions import COMPLEX_MOVEMENT
+
+    env = gym_super_mario_bros.make(kwargs['game'])
+    env = JoypadSpace(env, COMPLEX_MOVEMENT)
+    if kwargs['no_negative_reward']:
+        env = NoNegativeReward(env)
+    env = FrameSkip(env, 4)
+    env = ProcessFrame84(env, crop=True)
+    env = FrameStack(env, 4)
+    env = PytorchImage(env) # (h,w,c) -> (c,h,w)
+    if info_example is None:
+        env = GymEnvWrapper(env)
+    else:
+        env = GymEnvWrapper(EnvInfoWrapper(env))
+    return env

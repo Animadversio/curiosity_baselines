@@ -25,8 +25,10 @@ from rlpyt.samplers.parallel.gpu.sampler import GpuSampler
 from rlpyt.samplers.collections import TrajInfo
 from rlpyt.envs.atari.atari_env import AtariEnv, AtariTrajInfo
 from rlpyt.envs.mazeworld.mazeworld.envs.pycolab_env import PycolabTrajInfo
-from rlpyt.envs.gym import make as gym_make
-from rlpyt.envs.gym import mario_make, deepmind_make
+# from rlpyt.envs.gym import make as gym_make
+# from rlpyt.envs.gym import mario_make, deepmind_make
+from rlpyt.envs.gym_schema import make as gym_make
+from rlpyt.envs.gym_schema import mario_make, deepmind_make, atari_make, GymEnvWrapper
 
 # Learning Algorithms
 from rlpyt.algos.pg.ppo import PPO
@@ -268,7 +270,7 @@ def start_experiment(args):
             normalize_obs_steps=10000
             )
     elif args.env in _ATARI_ENVS:
-        env_cl = AtariEnv
+        env_cl = AtariEnv  #  atari_make
         traj_info_cl = AtariTrajInfo
         env_args = dict(
             game=args.env, 
