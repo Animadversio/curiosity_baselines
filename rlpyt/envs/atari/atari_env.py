@@ -10,8 +10,10 @@ from rlpyt.envs.base import Env, EnvStep
 from rlpyt.spaces.int_box import IntBox
 from rlpyt.utils.quick_args import save__init__args
 from rlpyt.samplers.collections import TrajInfo
+from rlpyt.utils.collections import NamedTupleSchema, NamedArrayTupleSchema
+# from gym.utils import seeding
 
-EnvInfo = namedtuple("EnvInfo", ["game_score", "traj_done"])
+EnvInfo = NamedTupleSchema("EnvInfo", ["game_score", "traj_done"])
 
 class AtariTrajInfo(TrajInfo):
     """TrajInfo class for use with Atari Env, to store raw game score separate
