@@ -1,6 +1,8 @@
 
 import os
 import json
+import sys
+
 import psutil
 import time
 import torch
@@ -11,11 +13,18 @@ from rlpyt.utils.seed import set_seed, set_envs_seeds
 
 from gym.wrappers import Monitor
 
-root_path = os.path.abspath(__file__).split('\\')[1:]
-# root_path = root_path[:root_path.index('curiosity_baselines')+1]
-# info_file_path = '/'+ '/'.join(root_path) + '/global.json'
-root_path = r"E:\DL_Projects\RL\curiosity_baselines" # hacky path change 
-info_file_path = r"E:\DL_Projects\RL\curiosity_baselines\global.json"
+
+if sys.platform == "win32":
+    # root_path = r"E:\DL_Projects\RL\curiosity_baselines"  # hacky path change
+    # info_file_path = r"E:\DL_Projects\RL\curiosity_baselines\global.json"
+    root_path = os.path.abspath(__file__)
+    root_path = root_path[:root_path.index('curiosity_baselines')+len("curiosity_baselines")]
+    info_file_path = os.path.join(root_path, "global.json")
+else:
+    root_path = os.path.abspath(__file__).split("/")[1:]
+    root_path = root_path[:root_path.index('curiosity_baselines')+1]
+    info_file_path = '/'+ '/'.join(root_path) + '/global.json'
+
 with open(info_file_path) as global_params_file:
     global_params = json.load(global_params_file)
     ATARI_ENVS = global_params['envs']['atari_envs']

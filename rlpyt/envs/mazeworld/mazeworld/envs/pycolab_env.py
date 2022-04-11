@@ -190,10 +190,15 @@ class PyColabEnv(gym.Env):
 
     def pycolab_init(self, logdir, log_heatmaps):
         self.log_heatmaps = log_heatmaps
-        # root_path = os.path.abspath(__file__).split('/')[1:]
-        # root_path = root_path[:root_path.index('curiosity_baselines')+1]
-        root_path = r"E:\DL_Projects\RL\curiosity_baselines"
-        self.heatmap_path = '/' + '/'.join(root_path) + '/' + '/'.join(logdir.split('/')[1:]) + '/heatmaps'
+        if sys.platform == "win32":
+            # root_path = r"E:\DL_Projects\RL\curiosity_baselines"
+            root_path = os.path.abspath(__file__)
+            root_path = root_path[:root_path.index('curiosity_baselines')+len("curiosity_baselines")]
+            self.heatmap_path = os.path.join(root_path, logdir, "heatmaps") 
+        else:
+            root_path = os.path.abspath(__file__).split('/')[1:]
+            root_path = root_path[:root_path.index('curiosity_baselines')+1]
+            self.heatmap_path = '/' + '/'.join(root_path) + '/' + '/'.join(logdir.split('/')[1:]) + '/heatmaps'
         if os.path.isdir(self.heatmap_path) == False and log_heatmaps == True:
             os.makedirs(self.heatmap_path)
 
