@@ -209,7 +209,7 @@ def mario_make(*args, info_example=None, **kwargs):
     rlpyt's ``GymEnvWrapper``, using ``gym_super_mario_bros.make(*args, **kwargs)``. If
     ``info_example`` is not ``None``, will include the ``EnvInfoWrapper``.
     """
-    import retro
+    # import retro
     import gym_super_mario_bros
     from nes_py.wrappers import JoypadSpace
     from gym_super_mario_bros.actions import COMPLEX_MOVEMENT
