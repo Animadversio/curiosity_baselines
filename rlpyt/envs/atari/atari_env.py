@@ -3,7 +3,9 @@ import numpy as np
 import os
 import glob
 import atari_py
-import cv2
+import sys
+if sys.platform == "win32":
+    import cv2 # temporary for cluster
 from collections import namedtuple
 
 from rlpyt.envs.base import Env, EnvStep

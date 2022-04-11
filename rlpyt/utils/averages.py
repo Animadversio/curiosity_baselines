@@ -3,7 +3,7 @@
 # import multiprocessing
 import gym
 import numpy as np
-import cv2
+# import cv2
 from copy import deepcopy
 
 from rlpyt.utils.misc import wrap_print
