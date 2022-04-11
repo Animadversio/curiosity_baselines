@@ -1,6 +1,6 @@
 
-from mpi4py import MPI
-import multiprocessing
+# from mpi4py import MPI
+# import multiprocessing
 import gym
 import numpy as np
 import cv2
