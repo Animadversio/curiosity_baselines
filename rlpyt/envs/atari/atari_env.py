@@ -214,7 +214,7 @@ class AtariEnv(Env):
         if has_cv2:
             img = cv2.resize(self._max_frame[1:-1], self._frame_shape, cv2.INTER_NEAREST)
         else:
-            img = resize(self._max_frame[1:-1], self._frame_shape, anti_aliasing=False, order=0)
+            img = resize(self._max_frame[1:-1], self._frame_shape, anti_aliasing=False, order=0)[:, :, 0]
         # NOTE: order OLDEST to NEWEST should match use in frame-wise buffer.
         self._obs = np.concatenate([self._obs[1:], img[np.newaxis]])
 
