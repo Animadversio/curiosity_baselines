@@ -4,8 +4,14 @@ import os
 import glob
 import atari_py
 import sys
-if sys.platform == "win32":
+# if sys.platform == "win32":
+try:
+    has_cv2 = True
     import cv2 # temporary for cluster
+except ImportError:
+    has_cv2 = False
+    from skimage.transform import resize
+    from skimage.io import imsave
 from collections import namedtuple
 
 from rlpyt.envs.base import Env, EnvStep
@@ -205,7 +211,10 @@ class AtariEnv(Env):
         """Max of last two frames; crop two rows; downsample by specified scheme."""
         self._get_screen(2)
         np.maximum(self._raw_frame_1, self._raw_frame_2, self._max_frame)
-        img = cv2.resize(self._max_frame[1:-1], self._frame_shape, cv2.INTER_NEAREST)
+        if has_cv2:
+            img = cv2.resize(self._max_frame[1:-1], self._frame_shape, cv2.INTER_NEAREST)
+        else:
+            img = resize(self._max_frame[1:-1], self._frame_shape, anti_aliasing=False, order=0)
         # NOTE: order OLDEST to NEWEST should match use in frame-wise buffer.
         self._obs = np.concatenate([self._obs[1:], img[np.newaxis]])
 
@@ -235,7 +244,10 @@ class AtariEnv(Env):
 
     def _write_img(self):
         if self.record_env and self._record_episode:
-            cv2.imwrite(self._frames_dir + '/{}.png'.format(self._frame_counter), self.render())
+            if has_cv2:
+                cv2.imwrite(os.path.join(self._frames_dir, f'{self._frame_counter}.png'), self.render())
+            else:
+                imsave(os.path.join(self._frames_dir, f'{self._frame_counter}.png'), self.render())
             self._frame_counter += 1
 
 
