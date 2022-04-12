@@ -9,7 +9,7 @@ from rlpyt.utils.tensor import infer_leading_dims, restore_leading_dims, valid_m
 from rlpyt.utils.averages import RunningMeanStd, RewardForwardFilter
 from rlpyt.models.utils import Flatten
 from rlpyt.models.curiosity.encoders import BurdaHead, MazeHead, UniverseHead
-import cv2
+# import cv2
 
 
 class RND(nn.Module):
