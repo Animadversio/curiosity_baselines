@@ -44,7 +44,10 @@ from rlpyt.utils.misc import wrap_print
 with open('./global.json') as global_params:
     params = json.load(global_params)
     _WORK_DIR = params['local_workdir']
-    _RESULTS_DIR = params['local_resultsdir']
+    if sys.platform == "linux2":
+        _RESULTS_DIR = params['cluster_resultsdir']
+    else:
+        _RESULTS_DIR = params['local_resultsdir']
     _TB_PORT = params['tb_port']
     _ATARI_ENVS = params['envs']['atari_envs']
     _MUJOCO_ENVS = params['envs']['mujoco_envs']
@@ -126,7 +129,9 @@ def launch_tmux(args):
 
 
 def start_experiment(args):
-
+    if sys.platform == "linux2":
+        args.log_dir = os.path.join(_RESULTS_DIR, args.log_dir)
+    
     args_json = json.dumps(vars(args), indent=4)
     if not os.path.isdir(args.log_dir):
         os.makedirs(args.log_dir)
