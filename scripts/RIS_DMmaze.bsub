@@ -9,7 +9,7 @@
 #BSUB -R 'rusage[mem=32GB]'
 #BSUB -M 32G
 #BSUB -u binxu.wang@wustl.edu
-#BSUB -o  /scratch1/fs1/crponce/simclr_fast_train.%J.%I
+#BSUB -o  /scratch1/fs1/holy/curiosityRL/deepmindmaze.%J.%I
 #BSUB -a 'docker(pytorchlightning/pytorch_lightning:base-cuda-py3.9-torch1.9)'
 
 
