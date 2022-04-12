@@ -1,0 +1,30 @@
+#!/bin/bash
+#BSUB -n 8
+#BSUB -q general
+#BSUB -G compute-holy
+#BSUB -J 'Atari[1-2]'
+#BSUB -gpu "num=1:gmodel=TeslaV100_SXM2_32GB"
+#BSUB -R 'gpuhost'
+#BSUB -R 'select[mem>32G]'
+#BSUB -R 'rusage[mem=32GB]'
+#BSUB -M 32G
+#BSUB -u binxu.wang@wustl.edu
+#BSUB -o  /scratch1/fs1/holy/curiosityRL/Atari.%J.%I
+#BSUB -a 'docker(pytorchlightning/pytorch_lightning:base-cuda-py3.9-torch1.9)'
+
+
+echo "$LSB_JOBINDEX"
+
+param_list=\
+'-curiosity_alg icm -env montezuma_revenge -feature_encoding idf_burda -log_dir ppo_montezuma_icm/run_0 
+-curiosity_alg rnd -env montezuma_revenge -feature_encoding none -log_dir ppo_montezuma_rnd/run_0 
+-curiosity_alg icm -env breakout -feature_encoding idf_burda -log_dir ppo_breakout_icm/run_0 
+-curiosity_alg rnd -env breakout -feature_encoding none -log_dir ppo_breakout_rnd/run_0 
+'
+# -discount 0.99 -lr 0.0001 -v_loss_coeff 1.0 -entropy_loss_coeff 0.001 -grad_norm_bound 1.0 -gae_lambda 0.95 -minibatches 1 -epochs 3 -ratio_clip 0.1 -kernel_mu 0.0 -kernel_sigma 0.001 -obs_type mask -max_episode_steps 500 -feature_encoding idf_maze -forward_loss_wt 0.2 -prediction_beta 1.0 -prediction_lr_scale 10.0 
+export extra_param="$(echo "$param_list" | head -n $LSB_JOBINDEX | tail -1)"
+echo "$extra_param"
+
+cd ~/curiosity_baselines/
+
+python launch.py $extra_param -alg ppo -serial 0 -log_heatmaps -iterations 5000000 -lstm -num_envs 16 -sample_mode gpu -num_gpus 1 -num_cpus 8 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -launch_tmux no 
