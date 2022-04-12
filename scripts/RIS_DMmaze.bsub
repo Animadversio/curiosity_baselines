@@ -28,4 +28,4 @@ echo "$extra_param"
 
 cd ~/curiosity_baselines/
 
-python launch.py $extra_param -alg ppo -serial 0 -log_heatmaps -iterations 5000000 -lstm -num_envs 8 -sample_mode gpu -num_gpus 1 -num_cpus 4 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -launch_tmux no 
+python launch.py $extra_param -alg ppo -serial 0 -log_heatmaps -iterations 5000000 -lstm -num_envs 8 -sample_mode gpu -num_gpus 1 -num_cpus 4 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -launch_tmux no 
