@@ -110,8 +110,10 @@ class PPO(PolicyGradientAlgo):
                 valid=valid
             )
             agent_curiosity_inputs = buffer_to(agent_curiosity_inputs, device=self.agent.device)
+        # TODO: add our curiosity type, format the input to curiosity as a predefined `namedarraytuple` type. 
         elif self.curiosity_type == 'none':
             agent_curiosity_inputs = None
+        
         loss_inputs = LossInputs(  # So can slice all.
             agent_inputs=agent_inputs,
             agent_curiosity_inputs=agent_curiosity_inputs,
@@ -168,6 +170,7 @@ class PPO(PolicyGradientAlgo):
                     forward_loss = curiosity_losses
                     opt_info.forward_loss.append(forward_loss.item())
                     opt_info.intrinsic_rewards.append(np.mean(self.intrinsic_rewards))
+                # TODO: add our curiosity type, and record curiosity loss in `opt_info` 
 
                 if self.normalize_reward:
                     opt_info.reward_total_std.append(self.reward_rms.var**0.5)
@@ -218,7 +221,7 @@ class PPO(PolicyGradientAlgo):
         value_loss = self.value_loss_coeff * valid_mean(value_error, valid)
 
         entropy = dist.mean_entropy(dist_info, valid)
-        perplexity = dist.mean_perplexity(dist_info, valid)
+        perplexity = dist.mean_perplexity(dist_info, valid) # exponent of entropy.
         entropy_loss = - self.entropy_loss_coeff * entropy
 
         loss = pi_loss + value_loss + entropy_loss
@@ -236,6 +239,7 @@ class PPO(PolicyGradientAlgo):
             forward_loss = self.agent.curiosity_loss(self.curiosity_type, *agent_curiosity_inputs)
             loss += forward_loss
             curiosity_losses = (forward_loss)
+        # TODO: add our curiosity type, and compute loss for our curioisty module to learn. 
         else:
             curiosity_losses = None
 
