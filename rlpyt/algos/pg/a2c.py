@@ -69,6 +69,7 @@ class A2C(PolicyGradientAlgo):
         to run forward pass on training data, and uses the
         ``agent.distribution`` to compute likelihoods and entropies.  Valid
         for feedforward or recurrent agents.
+        Note: A2C agent has not been equiped with curiosity module (no loss or learning for c module)
         """
         agent_inputs = AgentInputs(
             observation=samples.env.observation,
