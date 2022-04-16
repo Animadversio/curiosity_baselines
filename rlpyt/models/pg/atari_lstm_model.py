@@ -12,6 +12,7 @@ from rlpyt.models.curiosity.disagreement import Disagreement
 from rlpyt.models.curiosity.icm import ICM
 from rlpyt.models.curiosity.ndigo import NDIGO
 from rlpyt.models.curiosity.rnd import RND
+from rlpyt.models.curiosity.random_reward import RandomReward
 
 RnnState = namedarraytuple("RnnState", ["h", "c"])  # For downstream namedarraytuples to work
 
@@ -74,6 +75,13 @@ class AtariLstmModel(torch.nn.Module):
                 self.curiosity_model = RND(image_shape=image_shape,
                                            prediction_beta=curiosity_kwargs['prediction_beta'],
                                            drop_probability=curiosity_kwargs['drop_probability'],
+                                           gamma=curiosity_kwargs['gamma'],
+                                           device=curiosity_kwargs['device'])
+            # TODO: add our curiosity type, initialization of our curiosity algorithm
+            elif curiosity_kwargs['curiosity_alg'] == 'random_reward':
+                self.curiosity_model = RandomReward(image_shape=image_shape,
+                                           reward_scale=curiosity_kwargs['reward_scale'],
+                                           # drop_probability=curiosity_kwargs['drop_probability'],
                                            gamma=curiosity_kwargs['gamma'],
                                            device=curiosity_kwargs['device'])
             

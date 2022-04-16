@@ -19,67 +19,75 @@ class RandomReward(nn.Module):
     def __init__(
             self, 
             image_shape, 
-            prediction_beta=1.0,
+            reward_scale=1.0,
             drop_probability=1.0,
             gamma=0.99,
             device='cpu'
             ):
         super(RandomReward, self).__init__()
 
-        self.prediction_beta = prediction_beta
+        self.reward_scale = reward_scale
         self.drop_probability = drop_probability
         self.device = torch.device('cuda:0' if device == 'gpu' else 'cpu')
         if image_shape == (4, 5, 5):
             self.small_image = True
             c, h, w = image_shape
-            encoder = MazeHead(image_shape)
-            self.feature_size = encoder.output_size
-            self.conv_feature_size = encoder.conv_output_size
-            self.forward_model = encoder.model
-            self.obs_rms = RunningMeanStd(shape=(1, c, h, w)) # (T, B, c, h, w)
+            self.feature_size = 256
+            self.conv_feature_size = 256
+            self.forward_model = nn.Sequential(
+                nn.Conv2d(in_channels=c, out_channels=16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=16, out_channels=16, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2)),
+                nn.LeakyReLU(),
+                Flatten(),
+                nn.Linear(in_features=self.conv_feature_size, out_features=self.feature_size),
+                nn.LeakyReLU(),
+                nn.Linear(in_features=self.feature_size, out_features=1),
+            )
+            self.obs_rms = RunningMeanStd(shape=(1, c, h, w))  # (T, B, c, h, w)
             self.rew_rms = RunningMeanStd()
             self.rew_rff = RewardForwardFilter(gamma)
+
         else:
             self.small_image = False
             c, h, w = 1, image_shape[1], image_shape[2] # assuming grayscale inputs
-            self.obs_rms = RunningMeanStd(shape=(1, c, h, w)) # (T, B, c, h, w)
+            self.obs_rms = RunningMeanStd(shape=(1, c, h, w))  # (T, B, c, h, w)
             self.rew_rms = RunningMeanStd()
             self.rew_rff = RewardForwardFilter(gamma)
             self.feature_size = 512
             self.conv_feature_size = 7*7*64
             self.forward_model = nn.Sequential(
-                                            nn.Conv2d(
-                                                in_channels=1, out_channels=32, kernel_size=8, stride=4),
-                                            nn.LeakyReLU(),
-                                            nn.Conv2d(
-                                                in_channels=32, out_channels=64, kernel_size=4, stride=2),
-                                            nn.LeakyReLU(),
-                                            nn.Conv2d(
-                                                in_channels=64, out_channels=64, kernel_size=3, stride=1),
-                                            nn.LeakyReLU(),
-                                            Flatten(),
-                                            nn.Linear(self.conv_feature_size, self.feature_size),
-                                            nn.ReLU(),
-                                            nn.Linear(self.feature_size, self.feature_size),
-                                            nn.ReLU(),
-                                            nn.Linear(self.feature_size, self.feature_size)
-                                            )
+                nn.Conv2d(in_channels=1, out_channels=32, kernel_size=8, stride=4),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
+                nn.LeakyReLU(),
+                nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
+                nn.LeakyReLU(),
+                Flatten(),
+                nn.Linear(self.conv_feature_size, self.feature_size),
+                nn.ReLU(),
+                nn.Linear(self.feature_size, self.feature_size),
+                nn.ReLU(),
+                nn.Linear(self.feature_size, self.feature_size),
+                nn.ReLU(),
+                nn.Linear(self.feature_size, 1)
+                )
 
         for param in self.forward_model:
             if isinstance(param, nn.Conv2d) or isinstance(param, nn.Linear):
                 nn.init.orthogonal_(param.weight, np.sqrt(2))
                 param.bias.data.zero_()
+            param.requires_grad = False
 
-        for param in self.target_model:
+    def reset_forward_model(self):
+        for param in self.forward_model:
             if isinstance(param, nn.Conv2d) or isinstance(param, nn.Linear):
                 nn.init.orthogonal_(param.weight, np.sqrt(2))
                 param.bias.data.zero_()
-        for param in self.target_model.parameters():
             param.requires_grad = False
 
-
     def forward(self, obs, done=None):
-        raise NotImplementedError
+        # raise NotImplementedError
         # in case of frame stacking
         if not obs.shape[2:] == torch.Size([4, 5, 5]):
             obs = obs[:,:,-1,:,:]
@@ -123,21 +131,21 @@ class RandomReward(nn.Module):
 
         obs = ((obs - obs_mean) / torch.sqrt(obs_var))
         obs = torch.clamp(obs, -5, 5)
-        obs = obs.type(torch.float) # expect torch.uint8 inputs
+        obs = obs.type(torch.float)  # expect torch.uint8 inputs
 
-        # prediction target
-        phi = self.target_model(obs.clone().detach().view(T * B, *img_shape)).view(T, B, -1)
-
+        # # prediction target
+        # phi = self.target_model(obs.clone().detach().view(T * B, *img_shape)).view(T, B, -1)
         # make prediction
-        predicted_phi = self.forward_model(obs.detach().view(T * B, *img_shape)).view(T, B, -1)
+        predict_reward = self.forward_model(obs.detach().view(T * B, *img_shape)).view(T, B, -1)
 
-        return phi, predicted_phi, T, B
+        return predict_reward, T, B
 
     def compute_bonus(self, next_observation, done):
-        raise NotImplementedError
-        phi, predicted_phi, T, _ = self.forward(next_observation, done=done)
-        rewards = nn.functional.mse_loss(predicted_phi, phi.detach(), reduction='none').sum(-1)/self.feature_size
-        rewards_cpu = rewards.clone().cpu().data.numpy()
+        # raise NotImplementedError
+        predict_reward, T, _ = self.forward(next_observation, done=done)
+        rewards = predict_reward.squeeze(2)
+        # rewards = nn.functional.mse_loss(predicted_phi, phi.detach(), reduction='none').sum(-1)/self.feature_size
+        rewards_cpu = predict_reward.clone().cpu().data.numpy()
         done = torch.abs(done-1).cpu().data.numpy()
         total_rew_per_env = list()
         for i in range(T):
@@ -156,16 +164,17 @@ class RandomReward(nn.Module):
         rewards /= torch.sqrt(rew_var)
 
         rewards *= done
-        return self.prediction_beta * rewards
+        return self.reward_scale * rewards
 
     def compute_loss(self, observations, valid):
-        raise NotImplementedError
-        phi, predicted_phi, T, B = self.forward(observations, done=None)
-        forward_loss = nn.functional.mse_loss(predicted_phi, phi.detach(), reduction='none').sum(-1)/self.feature_size
-        mask = torch.rand(forward_loss.shape)
-        mask = (mask > self.drop_probability).type(torch.FloatTensor).to(self.device)
-        forward_loss = forward_loss * mask.detach()
-        forward_loss = valid_mean(forward_loss, valid.detach())
-        return forward_loss
+        # raise NotImplementedError
+        # phi, predicted_phi, T, B = self.forward(observations, done=None)
+        # forward_loss = nn.functional.mse_loss(predicted_phi, phi.detach(), reduction='none').sum(-1)/self.feature_size
+        # mask = torch.rand(forward_loss.shape)
+        # mask = (mask > self.drop_probability).type(torch.FloatTensor).to(self.device)
+        # forward_loss = forward_loss * mask.detach()
+        # forward_loss = valid_mean(forward_loss, valid.detach())
+        # return forward_loss
+        return 0
 
 

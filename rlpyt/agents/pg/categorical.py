@@ -99,7 +99,11 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
             curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
             agent_curiosity_info = RndInfo()
         # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it.
-
+        elif curiosity_type == 'random_reward':
+            next_observation, done = args
+            curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
+            agent_curiosity_info = RndInfo()
+        
         r_int = self.model.curiosity_model.compute_bonus(*curiosity_agent_inputs)
         r_int, agent_curiosity_info = buffer_to((r_int, agent_curiosity_info), device="cpu")
         return AgentCuriosityStep(r_int=r_int, agent_curiosity_info=agent_curiosity_info)
@@ -127,7 +131,12 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
             curiosity_agent_inputs = buffer_to((next_observation, valid), device=self.device)
             forward_loss = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)
             losses = (forward_loss.to("cpu"))
-
+        # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it.
+        elif curiosity_type == 'random_reward':
+            next_observation, valid = args
+            curiosity_agent_inputs = buffer_to((next_observation, valid), device=self.device)
+            forward_loss = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)
+            losses = torch.tensor(0.0)  # (forward_loss.to("cpu"))
         return losses
 
     @torch.no_grad()
