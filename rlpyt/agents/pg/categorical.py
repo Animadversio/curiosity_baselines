@@ -98,6 +98,7 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
             next_observation, done = args
             curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
             agent_curiosity_info = RndInfo()
+        # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it.
 
         r_int = self.model.curiosity_model.compute_bonus(*curiosity_agent_inputs)
         r_int, agent_curiosity_info = buffer_to((r_int, agent_curiosity_info), device="cpu")
