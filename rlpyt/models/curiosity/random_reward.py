@@ -36,8 +36,6 @@ class RandomReward(nn.Module):
             self.feature_size = encoder.output_size
             self.conv_feature_size = encoder.conv_output_size
             self.forward_model = encoder.model
-            encoder2 = MazeHead(image_shape)
-            self.target_model = encoder2.model
             self.obs_rms = RunningMeanStd(shape=(1, c, h, w)) # (T, B, c, h, w)
             self.rew_rms = RunningMeanStd()
             self.rew_rff = RewardForwardFilter(gamma)
@@ -49,30 +47,6 @@ class RandomReward(nn.Module):
             self.rew_rff = RewardForwardFilter(gamma)
             self.feature_size = 512
             self.conv_feature_size = 7*7*64
-
-            # Learned predictor model
-            # self.forward_model = nn.Sequential(nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
-            #                                    nn.LeakyReLU(),
-            #                                    nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-            #                                    nn.LeakyReLU(),
-            #                                    nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-            #                                    nn.LeakyReLU(),
-            #                                    Flatten(),
-            #                                    nn.Linear(self.conv_feature_size, self.feature_size),
-            #                                    nn.ReLU(),
-            #                                    nn.Linear(self.feature_size, self.feature_size),
-            #                                    nn.ReLU(),
-            #                                    nn.Linear(self.feature_size, self.feature_size))
-            # Fixed weight target model
-            # self.target_model = nn.Sequential(nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
-            #                                   nn.LeakyReLU(),
-            #                                   nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-            #                                   nn.LeakyReLU(),
-            #                                   nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-            #                                   nn.LeakyReLU(),
-            #                                   Flatten(),
-            #                                   nn.Linear(self.conv_feature_size, self.feature_size))
-
             self.forward_model = nn.Sequential(
                                             nn.Conv2d(
                                                 in_channels=1, out_channels=32, kernel_size=8, stride=4),
@@ -90,19 +64,6 @@ class RandomReward(nn.Module):
                                             nn.ReLU(),
                                             nn.Linear(self.feature_size, self.feature_size)
                                             )
-            self.target_model = nn.Sequential(
-                nn.Conv2d(
-                    in_channels=1, out_channels=32, kernel_size=8, stride=4),
-                nn.LeakyReLU(),
-                nn.Conv2d(
-                    in_channels=32, out_channels=64, kernel_size=4, stride=2),
-                nn.LeakyReLU(),
-                nn.Conv2d(
-                    in_channels=64, out_channels=64, kernel_size=3, stride=1),
-                nn.LeakyReLU(),
-                Flatten(),
-                nn.Linear(self.conv_feature_size, self.feature_size)
-            )
 
         for param in self.forward_model:
             if isinstance(param, nn.Conv2d) or isinstance(param, nn.Linear):
@@ -120,7 +81,7 @@ class RandomReward(nn.Module):
     def forward(self, obs, done=None):
         raise NotImplementedError
         # in case of frame stacking
-        if not obs.shape[2:] == torch.Size([4,5,5]):
+        if not obs.shape[2:] == torch.Size([4, 5, 5]):
             obs = obs[:,:,-1,:,:]
             obs = obs.unsqueeze(2)
 
