@@ -167,6 +167,8 @@ class RandomReward(nn.Module):
         return self.reward_scale * rewards
 
     def compute_loss(self, observations, valid):
+        # TODO: add the `reset_forward_model` call after certain number of steps.
+        #       reset the random reward model
         # raise NotImplementedError
         # phi, predicted_phi, T, B = self.forward(observations, done=None)
         # forward_loss = nn.functional.mse_loss(predicted_phi, phi.detach(), reduction='none').sum(-1)/self.feature_size
