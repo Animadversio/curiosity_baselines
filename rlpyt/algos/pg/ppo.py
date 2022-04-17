@@ -117,6 +117,12 @@ class PPO(PolicyGradientAlgo):
                 valid=valid
             )
             agent_curiosity_inputs = buffer_to(agent_curiosity_inputs, device=self.agent.device)
+        elif self.curiosity_type == 'count':
+            agent_curiosity_inputs = RndAgentCuriosityInputs(
+                next_observation=samples.env.next_observation.clone(),
+                valid=valid
+            )
+            agent_curiosity_inputs = buffer_to(agent_curiosity_inputs, device=self.agent.device)
 
         elif self.curiosity_type == 'none':
             agent_curiosity_inputs = None
@@ -179,6 +185,11 @@ class PPO(PolicyGradientAlgo):
                     opt_info.intrinsic_rewards.append(np.mean(self.intrinsic_rewards))
                 # TODO: add our curiosity type, and record curiosity loss in `opt_info` 
                 elif self.curiosity_type == 'random_reward':
+                    # forward_loss = curiosity_losses
+                    # opt_info.forward_loss.append(forward_loss.item())
+                    opt_info.forward_loss.append(0)
+                    opt_info.intrinsic_rewards.append(np.mean(self.intrinsic_rewards))
+                elif self.curiosity_type == 'count':
                     # forward_loss = curiosity_losses
                     # opt_info.forward_loss.append(forward_loss.item())
                     opt_info.forward_loss.append(0)
@@ -255,7 +266,9 @@ class PPO(PolicyGradientAlgo):
         elif self.curiosity_type == 'random_reward':
             self.agent.curiosity_loss(self.curiosity_type, *agent_curiosity_inputs)
             curiosity_losses = None
-            # loss += forward_loss
+        elif self.curiosity_type == 'count':
+            self.agent.curiosity_loss(self.curiosity_type, *agent_curiosity_inputs)
+            curiosity_losses = None
         else:
             curiosity_losses = None
 

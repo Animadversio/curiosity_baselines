@@ -13,7 +13,7 @@ def get_args(args_in=sys.argv[1:]):
     # main args
     parser.add_argument('-alg', type=str, choices=['ppo', 'sac', 'a2c'], help='Which learning algorithm to run.')
     # TODO: add our curiosity type, add choices
-    parser.add_argument('-curiosity_alg', type=str, choices=['none', 'icm', 'disagreement', 'ndigo', 'rnd', 'random_reward'], help='Which intrinsic reward algorithm to use.')
+    parser.add_argument('-curiosity_alg', type=str, choices=['none', 'icm', 'disagreement', 'ndigo', 'rnd', 'random_reward', 'count'], help='Which intrinsic reward algorithm to use.')
     parser.add_argument('-env', type=str, help='Which environment to run on.')
     
     # general args
@@ -105,8 +105,13 @@ def get_args(args_in=sys.argv[1:]):
     elif curiosity_alg == "random_reward":
         parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'], help='Which feature encoding method to use with RND.')
         parser.add_argument('-batch_norm', action='store_true', help='Whether or not to use batch norm in the feature encoder.')
-        # parser.add_argument('-batch_norm', action='store_true', help='Whether or not to use batch norm in the feature encoder.')
         parser.add_argument('-reward_scale', default=1.0, type=float, help='Scalar multiplier applied to the prediction error to generate the intrinsic reward. Environment dependent.')
+    elif curiosity_alg == "count":
+        parser.add_argument('-hashfun', default='SimHash', type=str, choices=['none', 'SimHash'], help='Which feature encoding method to use with RND.')
+        parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'], help='Which feature encoding method to use with RND.')
+        parser.add_argument('-batch_norm', action='store_true', help='Whether or not to use batch norm in the feature encoder.')
+        parser.add_argument('-reward_scale', default=1.0, type=float, help='Scalar multiplier applied to the prediction error to generate the intrinsic reward. Environment dependent.')
+        # parser.add_argument('-batch_norm', action='store_true', help='Whether or not to use batch norm in the feature encoder.')
     elif curiosity_alg == 'none':
         parser.add_argument('-feature_encoding', default='none', type=str, choices=['none'], help='Which feature encoding method to use with your policy.')
 

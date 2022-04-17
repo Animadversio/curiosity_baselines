@@ -13,6 +13,7 @@ from rlpyt.models.curiosity.icm import ICM
 from rlpyt.models.curiosity.ndigo import NDIGO
 from rlpyt.models.curiosity.rnd import RND
 from rlpyt.models.curiosity.random_reward import RandomReward
+from rlpyt.models.curiosity.count import CountBasedReward
 
 RnnState = namedarraytuple("RnnState", ["h", "c"])  # For downstream namedarraytuples to work
 
@@ -83,6 +84,11 @@ class AtariLstmModel(torch.nn.Module):
                                            reward_scale=curiosity_kwargs['reward_scale'],
                                            # drop_probability=curiosity_kwargs['drop_probability'],
                                            gamma=curiosity_kwargs['gamma'],
+                                           device=curiosity_kwargs['device'])
+            elif curiosity_kwargs['curiosity_alg'] == 'count':
+                self.curiosity_model = CountBasedReward(image_shape=image_shape,
+                                           alpha=curiosity_kwargs['reward_scale'],
+                                           hashfun=curiosity_kwargs['hashfun'],
                                            device=curiosity_kwargs['device'])
             
             if curiosity_kwargs['feature_encoding'] == 'idf':

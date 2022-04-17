@@ -103,6 +103,10 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
             next_observation, done = args
             curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
             agent_curiosity_info = RndInfo()
+        elif curiosity_type == 'count':
+            next_observation, done = args
+            curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
+            agent_curiosity_info = RndInfo()
         
         r_int = self.model.curiosity_model.compute_bonus(*curiosity_agent_inputs)
         r_int, agent_curiosity_info = buffer_to((r_int, agent_curiosity_info), device="cpu")
@@ -135,8 +139,14 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
         elif curiosity_type == 'random_reward':
             next_observation, valid = args
             curiosity_agent_inputs = buffer_to((next_observation, valid), device=self.device)
-            forward_loss = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)
+            _ = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)
             losses = torch.tensor(0.0)  # (forward_loss.to("cpu"))
+        elif curiosity_type == 'count':
+            next_observation, valid = args
+            curiosity_agent_inputs = buffer_to((next_observation, valid), device=self.device)
+            _ = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)
+            losses = torch.tensor(0.0)  # (forward_loss.to("cpu"))
+
         return losses
 
     @torch.no_grad()
