@@ -158,6 +158,7 @@ subdirs = ["ppo_RND_DM5Room\\run_0",
            "ppo_RND_DM5Room\\run_drop2_0",]
 
 mask = df_all.run_name.str.contains("|".join(re.escape(s) for s in subdirs))
+
 plt.figure(figsize=(10, 6))
 sns.lineplot(x="iter", y="visit_states_num", hue="run_name",
              data=df_all[mask], alpha=0.5, lw=2, legend=True)
@@ -185,3 +186,76 @@ sns.lineplot(x="iter", y="visit_states_num", hue="expname",
              data=drop_rate_df_all, alpha=0.3, lw=2, legend=True)
 plt.xlim([-25, 275])
 plt.show()
+#%%
+
+def sweep_folders_csv(subdirs=None, result_root=result_root, loginterval=3):
+    if subdirs is None:
+        expdirs = glob(join(result_root, "*\\*run*"))
+    elif isinstance(subdirs, str):
+        expdirs = glob(join(result_root, subdirs))
+    else:
+        expdirs = [join(result_root, subdir) for subdir in subdirs]
+
+    df_col = []
+    for expdir in expdirs:
+        df = pd.read_csv(join(expdir, "progress.csv"))
+        df["run_name"] = "\\".join(expdir.split("\\")[-2:])
+        df["expname"] = expdir.split("\\")[-2]
+        df["run"] = expdir.split("\\")[-1]
+        # _, _, df = get_coverage_curve(heatmap_dir, loginterval=loginterval)
+        df_col.append(df)
+
+    df_all = pd.concat(df_col)
+    df_all.reset_index(inplace=True)
+    return df_all
+
+progress_df_all = sweep_folders_csv(subdirs="ppo_RND_DMMaze_dp*\\run_*", result_root=result_root, )
+#%%
+progress_df_all[['first_visit_%s/Average'%(c) for c in ["a", "b", "c", "d", "e"]]]
+#%%
+plt.figure(figsize=(10, 6))
+sns.lineplot(x='Diagnostics/Iteration',
+             y='first_visit_a/Average', hue="expname",
+             data=progress_df_all, alpha=0.3, lw=2, legend=True)
+plt.xlim([-25, 275])
+plt.show()
+#%%
+plt.figure(figsize=(10, 6))
+sns.lineplot(x='Diagnostics/Iteration',
+             y='first_visit_a/Average', hue="run_name",
+             data=progress_df_all, alpha=0.3, lw=2, legend=True)
+plt.xlim([-25, 275])
+plt.show()
+#%%
+outdir = r"E:\DL_Projects\RL\curiosity_baselines\summary"
+for c in ["a", "b", "c", "d", "e"]:
+    figh, axs = plt.subplots(figsize=(10, 6))
+    sns.lineplot(x='Diagnostics/Iteration',
+                 y='visit_freq_%s/Average'%c, hue="expname",
+                data=progress_df_all, alpha=0.8, lw=2, legend=True)
+    plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+    axs.relim()
+    plt.tight_layout()
+    figh.savefig(join(outdir, "visit_freq_%s_cmp.png"%c))
+    plt.show()
+    #%
+    figh, axs = plt.subplots(figsize=(10, 6))
+    sns.lineplot(x='Diagnostics/Iteration',
+                 y='visit_freq_%s/Average'%c, hue="run_name",
+                data=progress_df_all, alpha=0.8, lw=2, legend=True)
+    plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+    axs.relim()
+    plt.tight_layout()
+    figh.savefig(join(outdir, "visit_freq_%s_allrun_cmp.png"%c))
+    plt.show()
+
+    figh, axs = plt.subplots(figsize=(10, 6))
+    sns.lineplot(x='Diagnostics/Iteration',
+                 y='first_visit_%s/Average'%c, hue="expname",
+                data=progress_df_all, alpha=0.8, lw=2, legend=True)
+    plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+    axs.relim()
+    plt.tight_layout()
+    figh.savefig(join(outdir, "first_visit_%s_cmp.png"%c))
+    plt.show()
+
