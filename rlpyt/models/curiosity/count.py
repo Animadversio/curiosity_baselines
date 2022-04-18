@@ -75,14 +75,18 @@ class CountBasedReward(nn.Module):
         # if not next_observation.shape[2:] == torch.Size([4,5,5]):
         #     next_observation = next_observation[:,:,-1,:,:]
         #     next_observation = next_observation.unsqueeze(2)
-        features = next_observation.flatten(start_dim=1)
+        lead_dim, T, B, img_shape = infer_leading_dims(next_observation, 3)
+        features = next_observation.flatten(start_dim=lead_dim)
+        # features = next_observation.flatten(start_dim=2)
+        features = features.reshape(T * B, -1)
         counts = self.counter.retrieve(features)
+        counts = counts.reshape(T, B)
         # key = torch.flatten(next_observation)
         # if key not in self.count:
         #     obs_count = self.EPS
         # else:
         #     obs_count = self.count[key] + self.EPS
-        rewards = 1 / torch.sqrt(counts).unsqueeze(1)
+        rewards = 1 / torch.sqrt(counts)
         rewards *= done
         return self.alpha * rewards
 
@@ -92,7 +96,10 @@ class CountBasedReward(nn.Module):
         # if not observations.shape[2:] == torch.Size([4, 5, 5]):
         #     observations = observations[:, :, -1, :, :]
         #     observations = observations.unsqueeze(2)
-        features = observations.flatten(start_dim=1)
+        lead_dim, T, B, img_shape = infer_leading_dims(observations, 3)
+        features = observations.flatten(start_dim=lead_dim)
+        # features = next_observation.flatten(start_dim=2)
+        features = features.reshape(T * B, -1)
         counts = self.counter.count(features)
         # key = torch.flatten(observations)
         # if key not in self.count:

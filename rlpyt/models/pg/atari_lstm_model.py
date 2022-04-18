@@ -106,7 +106,12 @@ class AtariLstmModel(torch.nn.Module):
                                      batch_norm=curiosity_kwargs['batch_norm'])
                 self.conv.output_size = self.curiosity_model.feature_size
             elif curiosity_kwargs['feature_encoding'] == 'none':
-                self.conv = Conv2dHeadModel(image_shape=image_shape,
+                if image_shape[1:] == (5, 5):
+                    self.conv = MazeHead(image_shape=image_shape,
+                                     output_size=fc_sizes,
+                                     batch_norm=False)
+                else:
+                    self.conv = Conv2dHeadModel(image_shape=image_shape,
                                             channels=channels or [16, 32],
                                             kernel_sizes=kernel_sizes or [8, 4],
                                             strides=strides or [4, 2],
@@ -115,7 +120,12 @@ class AtariLstmModel(torch.nn.Module):
                                             hidden_sizes=fc_sizes) # Applies nonlinearity at end.
 
         else:
-            self.conv = Conv2dHeadModel(
+            if image_shape[1:] == (5, 5):
+                self.conv = MazeHead(image_shape=image_shape,
+                                 output_size=fc_sizes,
+                                 batch_norm=False)
+            else:
+                self.conv = Conv2dHeadModel(
                 image_shape=image_shape,
                 channels=channels or [16, 32],
                 kernel_sizes=kernel_sizes or [8, 4],
