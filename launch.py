@@ -129,7 +129,7 @@ def launch_tmux(args):
 
 
 def start_experiment(args):
-    if sys.platform == "linux2":
+    if sys.platform in ["linux2", "linux"]:
         args.log_dir = os.path.join(_RESULTS_DIR, args.log_dir)
     
     args_json = json.dumps(vars(args), indent=4)
