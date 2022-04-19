@@ -8,12 +8,10 @@
 #BSUB -R 'select[mem>32G]'
 #BSUB -R 'rusage[mem=32GB]'
 #BSUB -M 32G
+#BSUB -N
 #BSUB -u binxu.wang@wustl.edu
 #BSUB -o  /scratch1/fs1/holy/curiosityRL/Maze.%J.%I
 #BSUB -a 'docker(pytorchlightning/pytorch_lightning:base-cuda-py3.9-torch1.9)'
-
-
-
 
 echo "$LSB_JOBINDEX"
 idx=$LSB_JOBINDEX
