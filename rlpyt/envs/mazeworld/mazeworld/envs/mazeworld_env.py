@@ -30,8 +30,8 @@ class MazeWorld(pycolab_env.PyColabEnv):
                  obs_type='mask',
                  default_reward=0.):
         self.level = level
-        self.objects = ['a', 'b', 'c', 'd', 'e', '@']
-        self.state_layer_chars = ['P', '#'] + self.objects
+        self.objects = ['a', 'b', 'c', 'd', 'e']
+        self.state_layer_chars = ['P', '#', '@'] + self.objects
         super(MazeWorld, self).__init__(
             max_iterations=max_iterations,
             obs_type=obs_type,

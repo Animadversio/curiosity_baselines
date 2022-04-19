@@ -67,7 +67,7 @@ def get_args(args_in=sys.argv[1:]):
     if 'mario' in environment.lower():
         parser.add_argument('-mario_level', default='Level1-1', type=str, help='World and level to start at for super mario bros.')
         parser.add_argument('-normalize_obs', action='store_true', help='Whether or not to normalize the observation each step.')
-    elif 'deepmind' in environment.lower():
+    elif 'deepmind' in environment.lower() or environment.startswith("Maze"):
         parser.add_argument('-log_heatmaps', action='store_true', help='Whether or not to store heatmaps.')
         parser.add_argument('-normalize_obs', action='store_true', help='Whether or not to normalize the observation each step.')
         parser.add_argument('-obs_type', default='mask', type=str, choices=['mask', 'rgb'], help='Whether to pass binary mask observations or RGB observations.')

@@ -99,4 +99,47 @@ python launch.py -alg ppo -curiosity_alg rnd -env DeepmindMaze-v0  -serial 0 -lo
 
 DeepmindMaze-v0
 
+python launch.py -alg ppo -curiosity_alg rnd -env DeepmindMaze-v0 -log_heatmaps -iterations 1000000 -lstm -num_envs 8 -sample_mode gpu -serial 0 -num_gpus 1 -num_cpus 8 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -log_dir results/ppo_RND_DMMaze_dp09_RGB/run_1 -discount 0.99 -lr 0.0001 -v_loss_coeff 1.0 -entropy_loss_coeff 0.001 -grad_norm_bound 1.0 -gae_lambda 0.95 -minibatches 1 -epochs 3 -ratio_clip 0.1 -kernel_mu 0.0 -kernel_sigma 0.001 -obs_type rgb -max_episode_steps 500 -feature_encoding none -prediction_beta 0.9 -launch_tmux no
+
+python launch.py -alg ppo -curiosity_alg rnd -env DeepmindMaze-v0 -log_heatmaps -iterations 1000000 -lstm -num_envs 8 -sample_mode gpu -serial 0 -num_gpus 1 -num_cpus 8 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -log_dir results/ppo_RND_DMMaze_dp10_RGB/run_1 -discount 0.99 -lr 0.0001 -v_loss_coeff 1.0 -entropy_loss_coeff 0.001 -grad_norm_bound 1.0 -gae_lambda 0.95 -minibatches 1 -epochs 3 -ratio_clip 0.1 -kernel_mu 0.0 -kernel_sigma 0.001 -obs_type rgb -max_episode_steps 500 -feature_encoding none -prediction_beta 1.0 -launch_tmux no
+
+
+
+# --------- Complex rewarded maze 
+
+set common_param=-alg ppo -iterations 2000000 -log_heatmaps -lstm -num_envs 8 -sample_mode gpu -serial 0 -num_gpus 1 -num_cpus 8 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -discount 0.99 -lr 0.0001 -v_loss_coeff 1.0 -entropy_loss_coeff 0.001 -grad_norm_bound 1.0 -gae_lambda 0.95 -minibatches 1 -epochs 3 -ratio_clip 0.1 -kernel_mu 0.0 -kernel_sigma 0.001 -obs_type mask -max_episode_steps 500 -launch_tmux no
+
+# Looping through iterations
+FOR /L %i IN (0,1,3) DO (
+
+python launch.py -env Maze-Lv0-v0 -curiosity_alg icm  -log_dir results/ppo_ICM_MazeLv0/run_%i -feature_encoding idf_maze %common_param%  -forward_loss_wt 0.2 -prediction_beta 1.0 -prediction_lr_scale 10.0 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg count  -log_dir results/ppo_count_MazeLv0_r10/run_%i -feature_encoding idf_maze %common_param%  -reward_scale 10.0
+python launch.py -env Maze-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_MazeLv0_r10/run_%i -feature_encoding idf_maze %common_param%  
+python launch.py -env Maze-Lv0-v0 -curiosity_alg none -log_dir results/ppo_none_MazeLv0/run_%i -feature_encoding none %common_param% 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp05/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.5
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp09/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.9
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp10/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 1.0
+
+)
+
+python launch.py -env Maze-Lv0-v0 -curiosity_alg icm  -log_dir results/ppo_ICM_MazeLv0/run_0 -feature_encoding idf_maze %common_param%  -forward_loss_wt 0.2 -prediction_beta 1.0 -prediction_lr_scale 10.0 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg count  -log_dir results/ppo_count_MazeLv0_r10/run_0 -feature_encoding idf_maze %common_param%  -reward_scale 10.0
+python launch.py -env Maze-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_MazeLv0_r10/run_0 -feature_encoding idf_maze %common_param% 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg none -log_dir results/ppo_none_MazeLv0/run_0 -feature_encoding none %common_param% 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp05/run_0 -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.5
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp09/run_0 -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.9
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp10/run_0 -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 1.0
+
+python launch.py -env Maze-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_MazeLv0_r10/run_0 -feature_encoding idf_maze %common_param% 
+
+python launch.py -env Maze-Lv0-v0 -curiosity_alg icm  -log_dir results/ppo_ICM_MazeLv0/run_1 -feature_encoding idf_maze %common_param%  -forward_loss_wt 0.2 -prediction_beta 1.0 -prediction_lr_scale 10.0 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg count  -log_dir results/ppo_count_MazeLv0_r10/run_1 -feature_encoding idf_maze %common_param%  -reward_scale 10.0
+python launch.py -env Maze-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_MazeLv0_r10/run_1 -feature_encoding idf_maze %common_param% 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg none -log_dir results/ppo_none_MazeLv0/run_1 -feature_encoding none %common_param% 
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp05/run_1 -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.5
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp09/run_1 -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.9
+python launch.py -env Maze-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_MazeLv0_dp10/run_1 -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 1.0
+
+
+
 

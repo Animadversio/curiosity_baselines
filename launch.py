@@ -267,7 +267,7 @@ def start_experiment(args):
             normalize_obs=args.normalize_obs,
             normalize_obs_steps=10000
             )
-    elif 'deepmind' in args.env.lower(): # pycolab deepmind environments
+    elif 'deepmind' in args.env.lower() or args.env.startswith("Maze"): # pycolab deepmind environments
         env_cl = deepmind_make
         traj_info_cl = PycolabTrajInfo
         env_args = dict(
