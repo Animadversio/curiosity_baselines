@@ -44,7 +44,10 @@ from rlpyt.utils.misc import wrap_print
 with open('./global.json') as global_params:
     params = json.load(global_params)
     _WORK_DIR = params['local_workdir']
-    _RESULTS_DIR = params['local_resultsdir']
+    if sys.platform == "linux2":
+        _RESULTS_DIR = params['cluster_resultsdir']
+    else:
+        _RESULTS_DIR = params['local_resultsdir']
     _TB_PORT = params['tb_port']
     _ATARI_ENVS = params['envs']['atari_envs']
     _MUJOCO_ENVS = params['envs']['mujoco_envs']
@@ -126,7 +129,9 @@ def launch_tmux(args):
 
 
 def start_experiment(args):
-
+    if sys.platform == "linux2":
+        args.log_dir = os.path.join(_RESULTS_DIR, args.log_dir)
+    
     args_json = json.dumps(vars(args), indent=4)
     if not os.path.isdir(args.log_dir):
         os.makedirs(args.log_dir)
@@ -178,6 +183,22 @@ def start_experiment(args):
         model_args['curiosity_kwargs']['gamma'] = args.discount
         model_args['curiosity_kwargs']['device'] = args.sample_mode
         model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
+    # TODO: add our curiosity type, add default parameters to our curiosity 
+    elif args.curiosity_alg == 'random_reward':
+        model_args['curiosity_kwargs']['feature_encoding'] = args.feature_encoding
+        model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale
+        # model_args['curiosity_kwargs']['drop_probability'] = args.drop_probability
+        model_args['curiosity_kwargs']['gamma'] = args.discount
+        model_args['curiosity_kwargs']['device'] = args.sample_mode
+        model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
+    elif args.curiosity_alg == 'count':
+        model_args['curiosity_kwargs']['hashfun'] = args.hashfun
+        model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale
+        # model_args['curiosity_kwargs']['drop_probability'] = args.drop_probability
+        model_args['curiosity_kwargs']['gamma'] = args.discount
+        model_args['curiosity_kwargs']['feature_encoding'] = args.feature_encoding
+        model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
+        model_args['curiosity_kwargs']['device'] = args.sample_mode
 
     if args.env in _MUJOCO_ENVS:
         if args.lstm:

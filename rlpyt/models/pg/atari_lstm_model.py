@@ -12,6 +12,8 @@ from rlpyt.models.curiosity.disagreement import Disagreement
 from rlpyt.models.curiosity.icm import ICM
 from rlpyt.models.curiosity.ndigo import NDIGO
 from rlpyt.models.curiosity.rnd import RND
+from rlpyt.models.curiosity.random_reward import RandomReward
+from rlpyt.models.curiosity.count import CountBasedReward
 
 RnnState = namedarraytuple("RnnState", ["h", "c"])  # For downstream namedarraytuples to work
 
@@ -76,6 +78,18 @@ class AtariLstmModel(torch.nn.Module):
                                            drop_probability=curiosity_kwargs['drop_probability'],
                                            gamma=curiosity_kwargs['gamma'],
                                            device=curiosity_kwargs['device'])
+            # TODO: add our curiosity type, initialization of our curiosity algorithm
+            elif curiosity_kwargs['curiosity_alg'] == 'random_reward':
+                self.curiosity_model = RandomReward(image_shape=image_shape,
+                                           reward_scale=curiosity_kwargs['reward_scale'],
+                                           # drop_probability=curiosity_kwargs['drop_probability'],
+                                           gamma=curiosity_kwargs['gamma'],
+                                           device=curiosity_kwargs['device'])
+            elif curiosity_kwargs['curiosity_alg'] == 'count':
+                self.curiosity_model = CountBasedReward(image_shape=image_shape,
+                                           alpha=curiosity_kwargs['reward_scale'],
+                                           hashfun=curiosity_kwargs['hashfun'],
+                                           device=curiosity_kwargs['device'])
             
             if curiosity_kwargs['feature_encoding'] == 'idf':
                 self.conv = UniverseHead(image_shape=image_shape,
@@ -92,7 +106,12 @@ class AtariLstmModel(torch.nn.Module):
                                      batch_norm=curiosity_kwargs['batch_norm'])
                 self.conv.output_size = self.curiosity_model.feature_size
             elif curiosity_kwargs['feature_encoding'] == 'none':
-                self.conv = Conv2dHeadModel(image_shape=image_shape,
+                if image_shape[1:] == (5, 5):
+                    self.conv = MazeHead(image_shape=image_shape,
+                                     output_size=fc_sizes,
+                                     batch_norm=False)
+                else:
+                    self.conv = Conv2dHeadModel(image_shape=image_shape,
                                             channels=channels or [16, 32],
                                             kernel_sizes=kernel_sizes or [8, 4],
                                             strides=strides or [4, 2],
@@ -101,7 +120,12 @@ class AtariLstmModel(torch.nn.Module):
                                             hidden_sizes=fc_sizes) # Applies nonlinearity at end.
 
         else:
-            self.conv = Conv2dHeadModel(
+            if image_shape[1:] == (5, 5):
+                self.conv = MazeHead(image_shape=image_shape,
+                                 output_size=fc_sizes,
+                                 batch_norm=False)
+            else:
+                self.conv = Conv2dHeadModel(
                 image_shape=image_shape,
                 channels=channels or [16, 32],
                 kernel_sizes=kernel_sizes or [8, 4],

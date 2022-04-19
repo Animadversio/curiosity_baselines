@@ -29,7 +29,7 @@ class RND(nn.Module):
         self.prediction_beta = prediction_beta
         self.drop_probability = drop_probability
         self.device = torch.device('cuda:0' if device == 'gpu' else 'cpu')
-        if image_shape == (4, 5, 5):
+        if image_shape[1:] == (5, 5):
             self.small_image = True
             c, h, w = image_shape
             encoder = MazeHead(image_shape)
@@ -120,7 +120,7 @@ class RND(nn.Module):
     def forward(self, obs, done=None):
 
         # in case of frame stacking
-        if not obs.shape[2:] == torch.Size([4,5,5]):
+        if not obs.shape[3:] == torch.Size([5,5]):
             obs = obs[:,:,-1,:,:]
             obs = obs.unsqueeze(2)
 
@@ -173,7 +173,7 @@ class RND(nn.Module):
         return phi, predicted_phi, T, B
 
     def compute_bonus(self, next_observation, done):
-        phi, predicted_phi, T, _ = self.forward(next_observation, done=done)
+        phi, predicted_phi, T, _ = self.forward(next_observation, done=done)  # phi, predicted_phi is T x B x feature_size
         rewards = nn.functional.mse_loss(predicted_phi, phi.detach(), reduction='none').sum(-1)/self.feature_size
         rewards_cpu = rewards.clone().cpu().data.numpy()
         done = torch.abs(done-1).cpu().data.numpy()
@@ -193,7 +193,7 @@ class RND(nn.Module):
             done = torch.from_numpy(np.array(done)).float()
         rewards /= torch.sqrt(rew_var)
 
-        rewards *= done
+        rewards *= done  # rewards shape is T x B
         return self.prediction_beta * rewards
 
     def compute_loss(self, observations, valid):

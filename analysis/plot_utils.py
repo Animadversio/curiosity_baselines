@@ -1,3 +1,6 @@
+"""Utils to plot or process heatmaps"""
+import os
+from os.path import join
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,3 +30,19 @@ def make_grid_np(img_arr, nrow=8, padding=2, pad_value=0):
 
 def upscale_pix2square(img, scale: int):
     return np.repeat(np.repeat(img, scale, 0), scale, 1)
+
+
+def summary_montage_heatmaps(heatmap_dir, loginterval=3, upscale=12, nrow=10):
+    heatmap_col = []
+    for i in range(loginterval, 10000, loginterval):
+        if os.path.exists(join(heatmap_dir, f"{i}.png")):
+            img = plt.imread(join(heatmap_dir, f"{i}.png"))
+            heatmap_col.append(img)
+        else:
+            break
+    if len(heatmap_col) == 0:
+        return 
+    print("Collect %d heatmaps"%len(heatmap_col))
+    mtg = make_grid_np(heatmap_col, nrow=10)
+    plt.imsave(join(heatmap_dir, "summary_heatmap.png"), upscale_pix2square(mtg, 12, ),)
+    return mtg

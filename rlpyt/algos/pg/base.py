@@ -57,6 +57,9 @@ class PolicyGradientAlgo(RlAlgorithm):
         or generalized advantage estimation.  Mask out invalid samples
         according to ``mid_batch_reset`` or for recurrent agent.  Optionally,
         normalize advantages.
+        - Add curiosity bonus into the extrinsic reward. 
+        - Record curiosity reward to the Algorithm. 
+        if intrinsic reward is mixed with extrinsic, then the agent cannot use two value network?
         """
         reward, done, value, bv = (samples.env.reward, samples.env.done, samples.agent.agent_info.value, samples.agent.bootstrap_value)
         done = done.type(reward.dtype)
@@ -70,7 +73,16 @@ class PolicyGradientAlgo(RlAlgorithm):
             reward += intrinsic_rewards
             self.intrinsic_rewards = intrinsic_rewards.clone().data.numpy()
         elif self.curiosity_type == 'rnd':
-            intrinsic_rewards, _ = self.agent.curiosity_step (self.curiosity_type, samples.env.next_observation.clone(), done.clone())
+            intrinsic_rewards, _ = self.agent.curiosity_step(self.curiosity_type, samples.env.next_observation.clone(), done.clone())
+            reward += intrinsic_rewards
+            self.intrinsic_rewards = intrinsic_rewards.clone().data.numpy()
+        # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it. 
+        elif self.curiosity_type == 'random_reward':
+            intrinsic_rewards, _ = self.agent.curiosity_step(self.curiosity_type, samples.env.next_observation.clone(), done.clone())
+            reward += intrinsic_rewards
+            self.intrinsic_rewards = intrinsic_rewards.clone().data.numpy()
+        elif self.curiosity_type == 'count':
+            intrinsic_rewards, _ = self.agent.curiosity_step(self.curiosity_type, samples.env.next_observation.clone(), done.clone())
             reward += intrinsic_rewards
             self.intrinsic_rewards = intrinsic_rewards.clone().data.numpy()
 
