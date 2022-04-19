@@ -195,6 +195,12 @@ class PyColabEnv(gym.Env):
             root_path = os.path.abspath(__file__)
             root_path = root_path[:root_path.index('curiosity_baselines')+len("curiosity_baselines")]
             self.heatmap_path = os.path.join(root_path, logdir, "heatmaps") 
+        elif sys.platform in ["linux2", "linux"]:
+            with open('./global.json') as global_params:
+                params = json.load(global_params)
+                if sys.platform in ["linux2", "linux"]:
+                    _RESULTS_DIR = params['cluster_resultsdir']
+            self.heatmap_path = os.path.join(_RESULTS_DIR, logdir, "heatmaps") 
         else:
             root_path = os.path.abspath(__file__).split('/')[1:]
             root_path = root_path[:root_path.index('curiosity_baselines')+1]

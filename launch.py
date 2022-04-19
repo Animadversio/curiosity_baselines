@@ -44,7 +44,7 @@ from rlpyt.utils.misc import wrap_print
 with open('./global.json') as global_params:
     params = json.load(global_params)
     _WORK_DIR = params['local_workdir']
-    if sys.platform == "linux2":
+    if sys.platform in ["linux2", "linux"]:
         _RESULTS_DIR = params['cluster_resultsdir']
     else:
         _RESULTS_DIR = params['local_resultsdir']
