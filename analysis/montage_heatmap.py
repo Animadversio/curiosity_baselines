@@ -185,7 +185,12 @@ plt.figure(figsize=(10, 6))
 sns.lineplot(x="iter", y="visit_states_num", hue="expname",
              data=drop_rate_df_all, alpha=0.3, lw=2, legend=True)
 plt.xlim([-25, 275])
+plt.savefig(join(outdir, "visit_states_num_cmp.png"))
 plt.show()
+#%%
+
+
+
 #%%
 
 def sweep_folders_csv(subdirs=None, result_root=result_root, loginterval=3):

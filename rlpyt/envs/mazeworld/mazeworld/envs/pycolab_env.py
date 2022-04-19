@@ -196,6 +196,7 @@ class PyColabEnv(gym.Env):
             root_path = root_path[:root_path.index('curiosity_baselines')+len("curiosity_baselines")]
             self.heatmap_path = os.path.join(root_path, logdir, "heatmaps") 
         elif sys.platform in ["linux2", "linux"]:
+            import json
             with open('./global.json') as global_params:
                 params = json.load(global_params)
                 if sys.platform in ["linux2", "linux"]:
