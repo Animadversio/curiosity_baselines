@@ -29,7 +29,7 @@ class RandomReward(nn.Module):
         self.reward_scale = reward_scale
         self.drop_probability = drop_probability
         self.device = torch.device('cuda:0' if device == 'gpu' else 'cpu')
-        if image_shape == (4, 5, 5):
+        if image_shape[1:] == (5, 5):
             self.small_image = True
             c, h, w = image_shape
             self.feature_size = 256
@@ -89,7 +89,7 @@ class RandomReward(nn.Module):
     def forward(self, obs, done=None):
         # raise NotImplementedError
         # in case of frame stacking
-        if not obs.shape[2:] == torch.Size([4, 5, 5]):
+        if not obs.shape[3:] == torch.Size([5, 5]):
             obs = obs[:,:,-1,:,:]
             obs = obs.unsqueeze(2)
 
