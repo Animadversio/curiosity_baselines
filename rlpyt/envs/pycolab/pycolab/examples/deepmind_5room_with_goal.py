@@ -62,7 +62,7 @@ MAZES_ART = [
      '##               ##',
      '# # a           # #',
      '#  #           #  #',
-     '#   #         #   #',
+     '#   #         # @ #',
      '#    #### ####    #',
      '#    #### ####    #',
      '#    ##     ##    #',
@@ -169,12 +169,13 @@ def make_game(level):
 
   return ascii_art.ascii_art_to_game(
       maze_ascii, what_lies_beneath=' ',
+      drapes={'@': CashDrape},
       sprites={
           'P': PlayerSprite,
           'a': FixedObject,
           'b': WhiteNoiseObject},
-      update_schedule=['P', 'a', 'b'],
-      z_order='abP')
+      update_schedule=['P', 'a', 'b', '@'],
+      z_order='ab@P')
 
 def make_croppers(level):
   """Builds and returns `ObservationCropper`s for the selected level.

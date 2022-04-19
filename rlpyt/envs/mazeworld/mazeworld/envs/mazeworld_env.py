@@ -15,7 +15,8 @@ from pycolab.examples import (better_scrolly_maze,
                               deepmind_8room,
                               deepmind_8room_v1,
                               deepmind_5room_moveable,
-                              deepmind_5room_moveable_v1
+                              deepmind_5room_moveable_v1,
+                              deepmind_5room_with_goal # add new envs here
                               )
 from pycolab import cropping
 from . import pycolab_env
