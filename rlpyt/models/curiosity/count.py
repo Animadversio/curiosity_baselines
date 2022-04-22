@@ -47,6 +47,44 @@ class SimHash(object) :
 
         return torch.from_numpy(np.array(counts)).to(self.device)
 
+
+class SimHash_cuda(object) :
+    """https://github.com/clementbernardd/Count-Based-Exploration/blob/main/python/simhash.py"""
+    def __init__(self, state_emb, k, device, EPS=1E-4) :
+        ''' Hashing between continuous state space and discrete state space '''
+        self.hash = {}
+        self.A = torch.randn(k, state_emb).cuda()
+        self.device = device
+        self.EPS = EPS
+
+    def count(self, states):
+        ''' Increase the count for the states and retourn the counts '''
+        counts = []
+        states_sign = torch.sign(self.A @ states.detach())
+        for signvec in states_sign:
+            key = tuple(signvec.tolist())
+            if key in self.hash:
+                self.hash[key] = self.hash[key] + 1
+            else:
+                self.hash[key] = 1
+            counts.append(self.hash[key])
+
+        return torch.from_numpy(np.array(counts)).to(self.device)
+
+    def retrieve(self, states):
+        ''' Increase the count for the states and retourn the counts '''
+        counts = []
+        states_sign = torch.sign(self.A @ states.detach())
+        for signvec in states_sign:
+            key = tuple(signvec.tolist())
+            if key in self.hash:
+                counts.append(self.hash[key])
+            else:
+                counts.append(self.EPS)
+
+        return torch.from_numpy(np.array(counts)).to(self.device)
+
+
 # counter = SimHash(75, 256, "cuda")
 class CountBasedReward(nn.Module):
     def __init__(
@@ -68,7 +106,7 @@ class CountBasedReward(nn.Module):
         self.EPS = EPS
         self.hashfun = hashfun
         if self.hashfun == "SimHash":
-            self.counter = SimHash(np.prod(self.image_shape), 256, "cuda")
+            self.counter = SimHash_cuda(np.prod(self.image_shape), 256, "cuda")
 
     def compute_bonus(self, next_observation, done):
         # raise NotImplementedError
