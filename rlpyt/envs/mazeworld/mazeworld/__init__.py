@@ -121,3 +121,9 @@ register(
     entry_point='mazeworld.envs:DeepmindMazeWorld_with_goal',
     max_episode_steps=500,
     kwargs={'level': 1, 'max_iterations': 500})
+
+register(
+    id='Deepmind5Room_randomgoal-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_with_goal',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'random_goal':True, 'max_iterations': 500})
