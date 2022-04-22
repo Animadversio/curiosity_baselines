@@ -11,6 +11,7 @@ images
 # Results directory, and mujoco key
 /results/
 /results_ris/
+/summary/
 mjkey.txt
 
 # HPC Launch files and logs

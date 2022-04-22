@@ -195,6 +195,13 @@ class PyColabEnv(gym.Env):
             root_path = os.path.abspath(__file__)
             root_path = root_path[:root_path.index('curiosity_baselines')+len("curiosity_baselines")]
             self.heatmap_path = os.path.join(root_path, logdir, "heatmaps") 
+        elif sys.platform in ["linux2", "linux"]:
+            import json
+            with open('./global.json') as global_params:
+                params = json.load(global_params)
+                if sys.platform in ["linux2", "linux"]:
+                    _RESULTS_DIR = params['cluster_resultsdir']
+            self.heatmap_path = os.path.join(_RESULTS_DIR, logdir, "heatmaps") 
         else:
             root_path = os.path.abspath(__file__).split('/')[1:]
             root_path = root_path[:root_path.index('curiosity_baselines')+1]
@@ -331,8 +338,8 @@ class PyColabEnv(gym.Env):
             np.save('{}/{}.npy'.format(self.heatmap_path, self.episodes), self.heatmap)
             heatmap_normed = self.heatmap / np.linalg.norm(self.heatmap)
             plt.imsave('{}/{}.png'.format(self.heatmap_path, self.episodes), heatmap_normed, cmap='afmhot', vmin=0.0, vmax=1.0)
-        if self.log_heatmaps == True and self.episodes % (self.heatmap_save_freq * 10) == 0:
-            summary_montage_heatmaps(self.heatmap_path, self.heatmap_save_freq, upscale=12, nrow=10)
+        # if self.log_heatmaps == True and self.episodes % (self.heatmap_save_freq * 10) == 0:
+        #    summary_montage_heatmaps(self.heatmap_path, self.heatmap_save_freq, upscale=12, nrow=10)
         
         self.episodes += 1
         self.heatmap = np.zeros(self._last_uncropped_observations.board.shape)

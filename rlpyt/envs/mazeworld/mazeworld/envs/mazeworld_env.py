@@ -15,7 +15,8 @@ from pycolab.examples import (better_scrolly_maze,
                               deepmind_8room,
                               deepmind_8room_v1,
                               deepmind_5room_moveable,
-                              deepmind_5room_moveable_v1
+                              deepmind_5room_moveable_v1,
+                              deepmind_5room_with_goal # add new envs here
                               )
 from pycolab import cropping
 from . import pycolab_env
@@ -30,8 +31,8 @@ class MazeWorld(pycolab_env.PyColabEnv):
                  obs_type='mask',
                  default_reward=0.):
         self.level = level
-        self.objects = ['a', 'b', 'c', 'd', 'e', '@']
-        self.state_layer_chars = ['P', '#'] + self.objects
+        self.objects = ['a', 'b', 'c', 'd', 'e']
+        self.state_layer_chars = ['P', '#', '@'] + self.objects
         super(MazeWorld, self).__init__(
             max_iterations=max_iterations,
             obs_type=obs_type,
@@ -289,6 +290,31 @@ class DeepmindMazeWorld_5room_moveable_v1(pycolab_env.PyColabEnv):
         return [cropping.ScrollingCropper(rows=5, cols=5, to_track=['P'], scroll_margins=(None, None), pad_char=' ')]
 
 
+class DeepmindMazeWorld_with_goal(pycolab_env.PyColabEnv):
+    """Deepmind World Discovery Models experiment 1.
+    """
+
+    def __init__(self,
+                 level=0,
+                 max_iterations=500,
+                 obs_type='mask',
+                 default_reward=0.):
+        self.level = level
+        self.objects = ['a', 'b']
+        self.state_layer_chars = ['#', '@'] + self.objects  # each char will produce a layer in the disentangled state
+        super(DeepmindMazeWorld_with_goal, self).__init__(
+            max_iterations=max_iterations,
+            obs_type=obs_type,
+            default_reward=default_reward,
+            action_space=spaces.Discrete(4 + 1), # left, right, up, down, no action
+            resize_scale=17)
+
+    def make_game(self):
+        self._croppers = self.make_croppers()
+        return deepmind_5room_with_goal.make_game(self.level)
+
+    def make_croppers(self):
+        return [cropping.ScrollingCropper(rows=5, cols=5, to_track=['P'], scroll_margins=(None, None), pad_char=' ')]
 
 
 

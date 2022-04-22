@@ -44,7 +44,7 @@ from rlpyt.utils.misc import wrap_print
 with open('./global.json') as global_params:
     params = json.load(global_params)
     _WORK_DIR = params['local_workdir']
-    if sys.platform == "linux2":
+    if sys.platform in ["linux2", "linux"]:
         _RESULTS_DIR = params['cluster_resultsdir']
     else:
         _RESULTS_DIR = params['local_resultsdir']
@@ -129,7 +129,7 @@ def launch_tmux(args):
 
 
 def start_experiment(args):
-    if sys.platform == "linux2":
+    if sys.platform in ["linux2", "linux"]:
         args.log_dir = os.path.join(_RESULTS_DIR, args.log_dir)
     
     args_json = json.dumps(vars(args), indent=4)
@@ -267,7 +267,7 @@ def start_experiment(args):
             normalize_obs=args.normalize_obs,
             normalize_obs_steps=10000
             )
-    elif 'deepmind' in args.env.lower(): # pycolab deepmind environments
+    elif 'deepmind' in args.env.lower() or args.env.startswith("Maze"): # pycolab deepmind environments
         env_cl = deepmind_make
         traj_info_cl = PycolabTrajInfo
         env_args = dict(
