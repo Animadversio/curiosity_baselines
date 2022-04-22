@@ -13,7 +13,9 @@ from .envs import (MazeWorld,
                     DeepmindMazeWorld_8room,
                     DeepmindMazeWorld_8room_v1,
                     DeepmindMazeWorld_5room_moveable,
-                    DeepmindMazeWorld_5room_moveable_v1)
+                    DeepmindMazeWorld_5room_moveable_v1,
+                    DeepmindMazeWorld_with_goal)
+
 
 def register(id, entry_point, max_episode_steps, kwargs):
     env_specs = gym.envs.registry.env_specs
@@ -108,4 +110,14 @@ register(
     max_episode_steps=500,
     kwargs={'level': 0, 'max_iterations': 500})
 
+register(
+    id='Deepmind5Room_goal-Lv0-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_with_goal',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500})
 
+register(
+    id='Deepmind5Room_goal-Lv1-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_with_goal',
+    max_episode_steps=500,
+    kwargs={'level': 1, 'max_iterations': 500})
