@@ -38,7 +38,7 @@ from pycolab import cropping
 from pycolab import human_ui
 from pycolab import things as plab_things
 from pycolab.prefab_parts import sprites as prefab_sprites
-
+from pycolab.examples.better_scrolly_maze import CashDrape
 # pylint: disable=line-too-long
 MAZES_ART = [
     # Each maze in MAZES_ART must have exactly one of the object sprites
@@ -122,7 +122,7 @@ ROOMS = {
       ],
 }
 
-def make_game(level):
+def make_game(level, with_goal=False, random_goal=False):
   """Builds and returns a mazee game for the selected level."""
   maze_ascii = MAZES_ART[level]
 
@@ -151,7 +151,39 @@ def make_game(level):
   new_coord = random.sample(ROOMS[5], 1)[0]
   maze_ascii[new_coord[0]] = maze_ascii[new_coord[0]][:new_coord[1]] + 'e' + maze_ascii[new_coord[0]][new_coord[1]+1:]
 
-  return ascii_art.ascii_art_to_game(
+  if with_goal:
+    if random_goal:
+      # for row in range(len(maze_ascii)):
+      #   if '@' in maze_ascii[row]:
+      #     maze_ascii[row] = maze_ascii[row].replace('@', ' ', 1)
+
+      maze_arr = np.array([[*row] for row in maze_ascii])
+      coord1, coord2 = np.where(np.array([[*row] for row in maze_arr]) == " ")
+      coords = [*zip(coord1, coord2)]
+      for pos in (ROOMS[0] + ROOMS[1]):
+        if tuple(pos) in coords:
+          coords.remove(tuple(pos))
+      # exclude ROOM 0
+      new_pos = random.sample(coords, 1)[0]
+      maze_ascii[new_pos[0]] = maze_ascii[new_pos[0]][:new_pos[1]] + '@' + maze_ascii[new_pos[0]][new_pos[1] + 1:]
+    else:
+      new_pos = (2, 2)
+      maze_ascii[new_pos[0]] = maze_ascii[new_pos[0]][:new_pos[1]] + '@' + maze_ascii[new_pos[0]][new_pos[1] + 1:]
+  if with_goal:
+    return ascii_art.ascii_art_to_game(
+      maze_ascii, what_lies_beneath=' ',
+      sprites={
+        'P': PlayerSprite,
+        'a': WhiteNoiseObject1,
+        'b': FixedObject,
+        'c': FixedObject,
+        'd': FixedObject,
+        'e': FixedObject},
+      drapes={'@': CashDrape},
+      update_schedule=['P', 'a', 'b', 'c', 'd', 'e', '@'],
+      z_order='abcde@P')
+  else:
+    return ascii_art.ascii_art_to_game(
       maze_ascii, what_lies_beneath=' ',
       sprites={
           'P': PlayerSprite,
@@ -160,8 +192,6 @@ def make_game(level):
           'c': FixedObject,
           'd': FixedObject,
           'e': FixedObject},
-      # drapes={
-      #     '@': CashDrape},
       update_schedule=['P', 'a', 'b', 'c', 'd', 'e'],
       z_order='abcdeP')
 

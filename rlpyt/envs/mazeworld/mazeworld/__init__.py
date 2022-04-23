@@ -87,6 +87,18 @@ register(
     kwargs={'level': 0, 'max_iterations': 500})
 
 register(
+    id='DeepmindMaze_goal-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500, "with_goal": True})
+
+register(
+    id='DeepmindMaze_randomgoal-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500, "with_goal": True, "random_goal": True})
+
+register(
     id='Deepmind8Room-v0',
     entry_point='mazeworld.envs:DeepmindMazeWorld_8room',
     max_episode_steps=500,
