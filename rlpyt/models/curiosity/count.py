@@ -60,7 +60,7 @@ class SimHash_cuda(object) :
     def count(self, states):
         ''' Increase the count for the states and retourn the counts '''
         counts = []
-        states_sign = torch.sign(self.A @ states.detach())
+        states_sign = torch.sign(states.detach() @ self.A.T)
         for signvec in states_sign:
             key = tuple(signvec.tolist())
             if key in self.hash:
@@ -74,7 +74,7 @@ class SimHash_cuda(object) :
     def retrieve(self, states):
         ''' Increase the count for the states and retourn the counts '''
         counts = []
-        states_sign = torch.sign(self.A @ states.detach())
+        states_sign = torch.sign(states.detach() @ self.A.T)
         for signvec in states_sign:
             key = tuple(signvec.tolist())
             if key in self.hash:
