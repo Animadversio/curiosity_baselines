@@ -191,6 +191,7 @@ def start_experiment(args):
         model_args['curiosity_kwargs']['gamma'] = args.discount
         model_args['curiosity_kwargs']['device'] = args.sample_mode
         model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
+        model_args['curiosity_kwargs']['nonneg'] = args.nonneg
     elif args.curiosity_alg == 'count':
         model_args['curiosity_kwargs']['hashfun'] = args.hashfun
         model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale
