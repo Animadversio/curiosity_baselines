@@ -83,6 +83,7 @@ class AtariLstmModel(torch.nn.Module):
                 self.curiosity_model = RandomReward(image_shape=image_shape,
                                            reward_scale=curiosity_kwargs['reward_scale'],
                                            # drop_probability=curiosity_kwargs['drop_probability'],
+                                           nonneg=curiosity_kwargs['nonneg'],
                                            gamma=curiosity_kwargs['gamma'],
                                            device=curiosity_kwargs['device'])
             elif curiosity_kwargs['curiosity_alg'] == 'count':

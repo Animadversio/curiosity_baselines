@@ -22,6 +22,7 @@ class RandomReward(nn.Module):
             reward_scale=1.0,
             drop_probability=1.0,
             gamma=0.99,
+            nonneg=False,
             device='cpu'
             ):
         super(RandomReward, self).__init__()
@@ -29,6 +30,7 @@ class RandomReward(nn.Module):
         self.reward_scale = reward_scale
         self.drop_probability = drop_probability
         self.device = torch.device('cuda:0' if device == 'gpu' else 'cpu')
+        self.nonneg = nonneg
         if image_shape[1:] == (5, 5):
             self.small_image = True
             c, h, w = image_shape
@@ -43,6 +45,7 @@ class RandomReward(nn.Module):
                 nn.Linear(in_features=self.conv_feature_size, out_features=self.feature_size),
                 nn.LeakyReLU(),
                 nn.Linear(in_features=self.feature_size, out_features=1),
+                nn.ReLU() if nonneg else nn.Identity()
             )
             self.obs_rms = RunningMeanStd(shape=(1, c, h, w))  # (T, B, c, h, w)
             self.rew_rms = RunningMeanStd()
@@ -70,7 +73,8 @@ class RandomReward(nn.Module):
                 nn.ReLU(),
                 nn.Linear(self.feature_size, self.feature_size),
                 nn.ReLU(),
-                nn.Linear(self.feature_size, 1)
+                nn.Linear(self.feature_size, 1),
+                nn.ReLU() if nonneg else nn.Identity()
                 )
 
         for param in self.forward_model:
