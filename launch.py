@@ -187,11 +187,12 @@ def start_experiment(args):
     elif args.curiosity_alg == 'random_reward':
         model_args['curiosity_kwargs']['feature_encoding'] = args.feature_encoding
         model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale
-        # model_args['curiosity_kwargs']['drop_probability'] = args.drop_probability
         model_args['curiosity_kwargs']['gamma'] = args.discount
         model_args['curiosity_kwargs']['device'] = args.sample_mode
         model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
         model_args['curiosity_kwargs']['nonneg'] = args.nonneg
+        model_args['curiosity_kwargs']['use_distr'] = args.use_distr
+        model_args['curiosity_kwargs']['zero_prob'] = args.zero_prob
     elif args.curiosity_alg == 'count':
         model_args['curiosity_kwargs']['hashfun'] = args.hashfun
         model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale

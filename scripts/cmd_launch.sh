@@ -187,3 +187,32 @@ python -c "print(%i)"
 )
 # set runId=%i
 echo %i
+set common_param=-alg ppo -iterations 1000000 -log_heatmaps -lstm -num_envs 6 -sample_mode gpu -serial 0 -num_gpus 1 -num_cpus 6 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -discount 0.99 -lr 0.0001 -v_loss_coeff 1.0 -entropy_loss_coeff 0.001 -grad_norm_bound 1.0 -gae_lambda 0.95 -minibatches 1 -epochs 3 -ratio_clip 0.1 -kernel_mu 0.0 -kernel_sigma 0.001 -obs_type mask -max_episode_steps 500 -launch_tmux no
+
+
+
+# python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_DM5roomRandGoal_tmp/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.5 -nonneg 1 %common_param% 
+# python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_DM5roomRandGoal_tmp/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.5 -nonneg 1 %common_param% 
+
+FOR /L %i IN (0,1,1) DO (
+python launch.py -env Deepmind5Room_goal-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomGoal_sprs02/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.2 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_goal-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomGoal_sprs05/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.5 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_goal-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomGoal_sprs08/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.8 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_goal-Lv0-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomGoal_sprs10/run_%i -feature_encoding idf_maze -use_distr -zero_prob 1.0 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_goal-Lv0-v0 -curiosity_alg none -log_dir results/ppo_none_DM5roomGoal/run_%i -feature_encoding none %common_param% 
+python launch.py -env Deepmind5Room_goal-Lv0-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_DM5roomGoal_dp01/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.1
+)
+
+python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomRandGoal_sprs02/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.2 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomRandGoal_sprs05/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.5 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomRandGoal_sprs08/run_%i -feature_encoding idf_maze -use_distr -zero_prob 0.8 -nonneg 1 %common_param% 
+python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/ppo_randdstr_DM5roomRandGoal_sprs10/run_%i -feature_encoding idf_maze -use_distr -zero_prob 1.0 -nonneg 1 %common_param% 
+
+
+
+# ---------------------- Off policy learning ------------------------
+set common_param=-alg dqn -iterations 1000000 -log_heatmaps -lstm -num_envs 6 -sample_mode gpu -serial 0 -num_gpus 1 -num_cpus 6 -eval_envs 0 -eval_max_steps 51000 -eval_max_traj 50 -timestep_limit 20 -log_interval 10000 -record_freq 0 -pretrain None -discount 0.99 -lr 0.0001 -v_loss_coeff 1.0 -entropy_loss_coeff 0.001 -grad_norm_bound 1.0 -gae_lambda 0.95 -minibatches 1 -epochs 3 -ratio_clip 0.1 -kernel_mu 0.0 -kernel_sigma 0.001 -obs_type mask -max_episode_steps 500 -launch_tmux no
+
+python launch.py -env Deepmind5Room_randomgoal-v0 -curiosity_alg random_reward  -log_dir results/dqn_randrew_DM5roomRandGoal/run_%i -feature_encoding idf_maze %common_param% 
+
+

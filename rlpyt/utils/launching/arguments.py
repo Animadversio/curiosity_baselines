@@ -107,6 +107,8 @@ def get_args(args_in=sys.argv[1:]):
         parser.add_argument('-batch_norm', action='store_true', help='Whether or not to use batch norm in the feature encoder.')
         parser.add_argument('-reward_scale', default=1.0, type=float, help='Scalar multiplier applied to the prediction error to generate the intrinsic reward. Environment dependent.')
         parser.add_argument('-nonneg', default=0, type=bool, help='Random reward needs to be non negative.')
+        parser.add_argument('-use_distr', action='store_true', help="Whether or not to use a shallow distribution instead of deep net")
+        parser.add_argument('-zero_prob', default=0.5, type=float, help="prob of the intrinsic reward being zero. controls sparsity")
     elif curiosity_alg == "count":
         parser.add_argument('-hashfun', default='SimHash', type=str, choices=['none', 'SimHash'], help='Which feature encoding method to use with RND.')
         parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'], help='Which feature encoding method to use with RND.')
