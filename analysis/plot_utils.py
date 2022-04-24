@@ -2,6 +2,7 @@
 import os
 from os.path import join
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 def make_grid_np(img_arr, nrow=8, padding=2, pad_value=0):
@@ -46,3 +47,36 @@ def summary_montage_heatmaps(heatmap_dir, loginterval=3, upscale=12, nrow=10):
     mtg = make_grid_np(heatmap_col, nrow=10)
     plt.imsave(join(heatmap_dir, "summary_heatmap.png"), upscale_pix2square(mtg, 12, ),)
     return mtg
+
+
+def get_coverage_curve(heatmap_dir, loginterval=3, total_num=None, show=True):
+    visitmap_col = []
+    iter_col = []
+    for itr in range(loginterval, 2000, loginterval):
+        if os.path.exists(join(heatmap_dir, f"{itr}.npy")):
+            visitmap = np.load(join(heatmap_dir, f"{itr}.npy"))
+            visitmap_col.append(visitmap)
+            iter_col.append(itr)
+        else:
+            break
+    if len(visitmap_col) == 0:
+        return np.array([]), np.array([]), pd.DataFrame({"iter": [], "visit_states_num": [], "run_name": []})
+    else:
+        print("Collect %d heatmaps" % len(visitmap_col))
+        visit_tsr = np.array(visitmap_col)
+        iter_vec = np.array(iter_col)
+        visit_states_num = np.count_nonzero(visit_tsr, axis=(1, 2))
+        #
+        # plt.plot(visit_states_num, label="visit states num")
+        # runname = heatmap_dir[len(result_root)+1:-len("heatmaps")-1]
+        runname = heatmap_dir[heatmap_dir.find("results\\")+len("results\\"):-len("heatmaps")-1]
+        plt.plot(iter_vec, visit_states_num, )
+        plt.xlabel("Iteration")
+        plt.ylabel("visit states")
+        plt.title(f"coverage curve of {runname}\n total{total_num}")
+        plt.savefig(join(heatmap_dir, "coverage_curve.png"))
+        if show:
+            plt.show()
+        df = pd.DataFrame({"iter": iter_vec, "visit_states_num": visit_states_num, "run_name": runname})
+        df.to_csv(join(heatmap_dir, "state_coverage.csv"))
+        return iter_vec, visit_states_num, df

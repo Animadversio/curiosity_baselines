@@ -89,6 +89,7 @@ def get_coverage_curve(heatmap_dir, loginterval=3, total_num=visitable_pos_num):
         plt.savefig(join(heatmap_dir, "coverage_curve.png"))
         plt.show()
         df = pd.DataFrame({"iter": iter_vec, "visit_states_num": visit_states_num, "run_name": runname})
+        df.to_csv(join(heatmap_dir, "state_coverage.csv"))
         return iter_vec, visit_states_num, df
 
 

@@ -395,6 +395,14 @@ def start_experiment(args):
 
     with logger_context(args.log_dir, config, snapshot_mode="last", use_summary_writer=True):
         runner.train()
+    if hasattr(args, "log_heatmaps"):
+        if args.log_heatmaps:
+            from analysis.plot_utils import summary_montage_heatmaps, get_coverage_curve
+            import matplotlib
+            matplotlib.use('agg')
+            heatmap_dir = os.path.join(args.log_dir, "heatmaps")
+            summary_montage_heatmaps(heatmap_dir, loginterval=3, upscale=12, nrow=10)
+            get_coverage_curve(heatmap_dir, loginterval=3, show=False)
 
 
 if __name__ == "__main__":
