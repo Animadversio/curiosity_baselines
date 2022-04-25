@@ -11,7 +11,7 @@ from rlpyt.models.curiosity.encoders import UniverseHead, BurdaHead, MazeHead
 from rlpyt.models.curiosity.disagreement import Disagreement
 from rlpyt.models.curiosity.icm import ICM
 from rlpyt.models.curiosity.ndigo import NDIGO
-from rlpyt.models.curiosity.rnd import RND
+from rlpyt.models.curiosity.rnd import RND, RND_noerr
 from rlpyt.models.curiosity.random_reward import RandomReward, RandomDistrReward
 from rlpyt.models.curiosity.count import CountBasedReward
 
@@ -73,7 +73,14 @@ class AtariLstmModel(torch.nn.Module):
                                              device=curiosity_kwargs['device'],
                                              )
             elif curiosity_kwargs['curiosity_alg'] == 'rnd':
-                self.curiosity_model = RND(image_shape=image_shape,
+                if curiosity_kwargs['no_error']:
+                    self.curiosity_model = RND_noerr(image_shape=image_shape,
+                                           prediction_beta=curiosity_kwargs['prediction_beta'],
+                                           drop_probability=curiosity_kwargs['drop_probability'],
+                                           gamma=curiosity_kwargs['gamma'],
+                                           device=curiosity_kwargs['device'])
+                else:
+                    self.curiosity_model = RND(image_shape=image_shape,
                                            prediction_beta=curiosity_kwargs['prediction_beta'],
                                            drop_probability=curiosity_kwargs['drop_probability'],
                                            gamma=curiosity_kwargs['gamma'],

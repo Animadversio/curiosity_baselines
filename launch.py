@@ -183,6 +183,7 @@ def start_experiment(args):
         model_args['curiosity_kwargs']['gamma'] = args.discount
         model_args['curiosity_kwargs']['device'] = args.sample_mode
         model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
+        model_args['curiosity_kwargs']['no_error'] = args.no_error
     # TODO: add our curiosity type, add default parameters to our curiosity 
     elif args.curiosity_alg == 'random_reward':
         model_args['curiosity_kwargs']['feature_encoding'] = args.feature_encoding

@@ -101,6 +101,7 @@ def get_args(args_in=sys.argv[1:]):
         parser.add_argument('-batch_norm', action='store_true', help='Whether or not to use batch norm in the feature encoder.')
         parser.add_argument('-prediction_beta', default=1.0, type=float, help='Scalar multiplier applied to the prediction error to generate the intrinsic reward. Environment dependent.')
         parser.add_argument('-drop_probability', default=1.0, type=float, help='Decimal percent of experience to drop when training the predictor model.')
+        parser.add_argument('-no_error', action='store_true', help="Whether or not to use a shallow distribution instead of deep net")
     # TODO: add our curiosity type, add command line interface extra arguments
     elif curiosity_alg == "random_reward":
         parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'], help='Which feature encoding method to use with RND.')
