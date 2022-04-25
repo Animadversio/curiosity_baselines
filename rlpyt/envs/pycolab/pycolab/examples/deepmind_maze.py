@@ -167,7 +167,8 @@ def make_game(level, with_goal=False, random_goal=False):
       new_pos = random.sample(coords, 1)[0]
       maze_ascii[new_pos[0]] = maze_ascii[new_pos[0]][:new_pos[1]] + '@' + maze_ascii[new_pos[0]][new_pos[1] + 1:]
     else:
-      new_pos = (2, 2)
+      # new_pos = (2, 2)
+      new_pos = (5, 18)
       maze_ascii[new_pos[0]] = maze_ascii[new_pos[0]][:new_pos[1]] + '@' + maze_ascii[new_pos[0]][new_pos[1] + 1:]
   if with_goal:
     return ascii_art.ascii_art_to_game(
