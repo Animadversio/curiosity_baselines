@@ -274,7 +274,7 @@ def main(argv=()):
   level = int(argv[1]) if len(argv) > 1 else 0
 
   # Build the game.
-  game = make_game(level)
+  game = make_game(level, with_goal=True, random_goal=True)
   # Build the croppers we'll use to scroll around in it, etc.
   croppers = make_croppers(level)
 
