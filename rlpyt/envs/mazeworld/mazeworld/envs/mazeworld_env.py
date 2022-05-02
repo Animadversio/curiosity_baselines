@@ -162,12 +162,14 @@ class DeepmindMazeWorld_maze(pycolab_env.PyColabEnv):
                  obs_type='mask',
                  default_reward=0.,
                  with_goal=False,
-                 random_goal=False):
+                 random_goal=False,
+                 goal_pos=(5, 18)):
         self.level = level
         self.objects = ['a', 'b', 'c', 'd', 'e']
         self.state_layer_chars = ['#', "@"] + self.objects # each char will produce a layer in the disentangled state
         self.with_goal = with_goal
         self.random_goal = random_goal
+        self.goal_pos = goal_pos
         super(DeepmindMazeWorld_maze, self).__init__(
             max_iterations=max_iterations,
             obs_type=obs_type,
@@ -178,7 +180,8 @@ class DeepmindMazeWorld_maze(pycolab_env.PyColabEnv):
 
     def make_game(self):
         self._croppers = self.make_croppers()
-        return deepmind_maze.make_game(self.level, with_goal=self.with_goal, random_goal=self.random_goal)
+        return deepmind_maze.make_game(self.level, with_goal=self.with_goal,
+                                       random_goal=self.random_goal, goal_pos=self.goal_pos)
 
     def make_croppers(self):
         return [cropping.ScrollingCropper(rows=5, cols=5, to_track=['P'], scroll_margins=(None, None), pad_char=' ')]

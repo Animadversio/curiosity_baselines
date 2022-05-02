@@ -86,11 +86,36 @@ register(
     max_episode_steps=500,
     kwargs={'level': 0, 'max_iterations': 500})
 
+# Deepmind Maze with goal of different distance.
 register(
     id='DeepmindMaze_goal-v0',
     entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
     max_episode_steps=500,
     kwargs={'level': 0, 'max_iterations': 500, "with_goal": True})
+
+register(
+    id='DeepmindMaze_goal-mid-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500, "with_goal": True, "goal_pos": (10, 13)})
+
+register(
+    id='DeepmindMaze_goal-dif-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500, "with_goal": True, "goal_pos": (7, 16)})
+
+register(
+    id='DeepmindMaze_goal-ddif-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500, "with_goal": True, "goal_pos": (4, 18)})
+
+register(
+    id='DeepmindMaze_goal-dddif-v0',
+    entry_point='mazeworld.envs:DeepmindMazeWorld_maze',
+    max_episode_steps=500,
+    kwargs={'level': 0, 'max_iterations': 500, "with_goal": True, "goal_pos": (2, 13)})
 
 register(
     id='DeepmindMaze_randomgoal-v0',

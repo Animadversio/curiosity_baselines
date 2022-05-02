@@ -38,7 +38,7 @@ from pycolab import cropping
 from pycolab import human_ui
 from pycolab import things as plab_things
 from pycolab.prefab_parts import sprites as prefab_sprites
-from pycolab.examples.better_scrolly_maze import CashDrape
+from pycolab.examples.better_scrolly_maze import CashDrape # this is the 100$ cash reward. 
 # pylint: disable=line-too-long
 MAZES_ART = [
     # Each maze in MAZES_ART must have exactly one of the object sprites
@@ -122,7 +122,7 @@ ROOMS = {
       ],
 }
 
-def make_game(level, with_goal=False, random_goal=False):
+def make_game(level, with_goal=False, random_goal=False, goal_pos=(5, 18)):
   """Builds and returns a mazee game for the selected level."""
   maze_ascii = MAZES_ART[level]
 
@@ -168,7 +168,7 @@ def make_game(level, with_goal=False, random_goal=False):
       maze_ascii[new_pos[0]] = maze_ascii[new_pos[0]][:new_pos[1]] + '@' + maze_ascii[new_pos[0]][new_pos[1] + 1:]
     else:
       # new_pos = (2, 2)
-      new_pos = (5, 18)
+      new_pos = goal_pos  # (5, 18)
       maze_ascii[new_pos[0]] = maze_ascii[new_pos[0]][:new_pos[1]] + '@' + maze_ascii[new_pos[0]][new_pos[1] + 1:]
   if with_goal:
     return ascii_art.ascii_art_to_game(
@@ -274,7 +274,7 @@ def main(argv=()):
   level = int(argv[1]) if len(argv) > 1 else 0
 
   # Build the game.
-  game = make_game(level, with_goal=True, random_goal=True)
+  game = make_game(level, with_goal=True, random_goal=False, goal_pos=(7, 16))
   # Build the croppers we'll use to scroll around in it, etc.
   croppers = make_croppers(level)
 
