@@ -11,6 +11,7 @@ images
 # Results directory, and mujoco key
 /results/
 /results_ris/
+/results_DMMaze/
 /summary/
 mjkey.txt
 
