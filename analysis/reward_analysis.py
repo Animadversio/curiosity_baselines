@@ -1,7 +1,8 @@
 from mazeworld.envs import MazeWorld, DeepmindMazeWorld_with_goal
 # from rlpyt.models.curiosity import random_reward, rnd, disagreement, ndigo
-from rlpyt.models.curiosity.random_reward import RandomReward, RandomDistrReward
-from rlpyt.models.curiosity.rnd import RND
+from rlpyt.models.curiosity.random_reward import RandomReward, \
+    RandomDistrReward, RandomReward_movthresh
+from rlpyt.models.curiosity.rnd import RND, RND_noerr
 from rlpyt.models.curiosity.disagreement import Disagreement
 from rlpyt.models.curiosity.ndigo import NDIGO
 import matplotlib.pyplot as plt
@@ -71,8 +72,27 @@ def visualize_bonus(reward_map, intr_rew, modelname=""):
 #
 env = gym_make('DeepmindMaze_goal-v0')
 env.pycolab_init("tmp", False)
-#%%
 obs_tsr, done_tsr, coords_arr = collect_all_obs(env, )
+#%%
+curios_mod = RandomReward_movthresh(image_shape=(7, 5, 5), update_freq=30,
+             reward_scale=1, gamma=0.99, nonneg=True, device='cuda', decay_timescale=100, )
+reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
+                                   obs_tsr, done_tsr, coords_arr)
+# reward_map, intr_rew, obs_tsr = calculate_bonus_map(env, curios_mod)
+visualize_bonus(reward_map, intr_rew, "Random Reward Network")
+#%%
+for _ in range(20):
+    curios_mod.compute_loss(None, None)
+
+reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
+                                   obs_tsr, done_tsr, coords_arr)
+# reward_map, intr_rew, obs_tsr = calculate_bonus_map(env, curios_mod)
+visualize_bonus(reward_map, intr_rew, "Random Reward Network_update")
+#%%
+reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
+                                   obs_tsr, done_tsr, coords_arr)
+# reward_map, intr_rew, obs_tsr = calculate_bonus_map(env, curios_mod)
+visualize_bonus(reward_map, intr_rew, "Random Reward Network")
 #%%
 curios_mod = RND(image_shape=(7, 5, 5), device="cuda")
 reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
@@ -95,7 +115,44 @@ reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
                                    obs_tsr, done_tsr, coords_arr)
 # reward_map, intr_rew, obs_tsr = calculate_bonus_map(env, curios_mod)
 visualize_bonus(reward_map, intr_rew, "Random distribution")
-
+#%%
+env = gym_make('DeepmindMaze_goal-v0')
+env.pycolab_init("tmp", False)
+obs_tsr, done_tsr, coords_arr = collect_all_obs(env, )
+#%%
+curios_mod = RND_noerr(image_shape=(7, 5, 5), gamma=0.99, device='cuda')
+reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
+                                   obs_tsr, done_tsr, coords_arr)
+# reward_map, intr_rew, obs_tsr = calculate_bonus_map(env, curios_mod)
+visualize_bonus(reward_map, intr_rew, "Random feature norm")
+#%%
+reward_map_all = []
+intr_rew_all = []
+for i in range(500):
+    curios_mod = RND_noerr(image_shape=(7, 5, 5), gamma=0.99, device='cuda')
+    reward_map, intr_rew, obs_tsr = compute_bonus_from_obs(env, curios_mod,
+                                       obs_tsr, done_tsr, coords_arr)
+    reward_map_all.append(reward_map)
+    intr_rew_all.append(intr_rew)
+#%%
+reward_map_all = torch.stack(reward_map_all)
+intr_rew_all = torch.stack(intr_rew_all)
+#%%
+reward_map_s = reward_map_all.std(dim=0)
+reward_map_m = reward_map_all.mean(dim=0)
+#%%
+# plt.hist(intr_rew.numpy().squeeze(), bins=35)
+# plt.title(modelname)
+# plt.show()
+sns.heatmap(reward_map_s)
+plt.axis("equal")
+plt.title("Random Feat norm std")
+plt.show()
+sns.heatmap(reward_map_m)
+plt.axis("equal")
+plt.title("Random Feat norm mean")
+plt.show()
+#%%
 
 #%%
 from easydict import EasyDict
