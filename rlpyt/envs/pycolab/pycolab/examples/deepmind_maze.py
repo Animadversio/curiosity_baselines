@@ -152,11 +152,10 @@ def make_game(level, with_goal=False, random_goal=False, goal_pos=(5, 18)):
   maze_ascii[new_coord[0]] = maze_ascii[new_coord[0]][:new_coord[1]] + 'e' + maze_ascii[new_coord[0]][new_coord[1]+1:]
 
   if with_goal:
+    for row in range(len(maze_ascii)):
+      if '@' in maze_ascii[row]:
+        maze_ascii[row] = maze_ascii[row].replace('@', ' ', 1)
     if random_goal:
-      # for row in range(len(maze_ascii)):
-      #   if '@' in maze_ascii[row]:
-      #     maze_ascii[row] = maze_ascii[row].replace('@', ' ', 1)
-
       maze_arr = np.array([[*row] for row in maze_ascii])
       coord1, coord2 = np.where(np.array([[*row] for row in maze_arr]) == " ")
       coords = [*zip(coord1, coord2)]
