@@ -77,7 +77,7 @@ class PolicyGradientAlgo(RlAlgorithm):
             reward += intrinsic_rewards
             self.intrinsic_rewards = intrinsic_rewards.clone().data.numpy()
         # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it. 
-        elif self.curiosity_type == 'random_reward':
+        elif self.curiosity_type in ['random_reward', 'random_reward_mov']:
             intrinsic_rewards, _ = self.agent.curiosity_step(self.curiosity_type, samples.env.next_observation.clone(), done.clone())
             reward += intrinsic_rewards
             self.intrinsic_rewards = intrinsic_rewards.clone().data.numpy()

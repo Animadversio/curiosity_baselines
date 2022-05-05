@@ -99,7 +99,7 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
             curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
             agent_curiosity_info = RndInfo()
         # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it.
-        elif curiosity_type == 'random_reward':
+        elif curiosity_type in ['random_reward', 'random_reward_mov']:
             next_observation, done = args
             curiosity_agent_inputs = buffer_to((next_observation, done), device=self.device)
             agent_curiosity_info = RndInfo()
@@ -136,7 +136,7 @@ class RecurrentCategoricalPgAgentBase(BaseAgent):
             forward_loss = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)
             losses = (forward_loss.to("cpu"))
         # TODO: add our curiosity type, add the intrinsic reward to extrinsic reward and record it.
-        elif curiosity_type == 'random_reward':
+        elif curiosity_type in ['random_reward', 'random_reward_mov']:
             next_observation, valid = args
             curiosity_agent_inputs = buffer_to((next_observation, valid), device=self.device)
             _ = self.model.curiosity_model.compute_loss(*curiosity_agent_inputs)

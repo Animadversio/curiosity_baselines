@@ -22,13 +22,15 @@ class RND(nn.Module):
             prediction_beta=1.0,
             drop_probability=1.0,
             gamma=0.99,
-            device='cpu'
+            device='cpu',
+            shuffle=False
             ):
         super(RND, self).__init__()
 
         self.prediction_beta = prediction_beta
         self.drop_probability = drop_probability
         self.device = torch.device('cuda:0' if device == 'gpu' else 'cpu')
+        self.shuffle = shuffle
         if image_shape[1:] == (5, 5):
             self.small_image = True
             c, h, w = image_shape
@@ -194,6 +196,10 @@ class RND(nn.Module):
         rewards /= torch.sqrt(rew_var)
 
         rewards *= done  # rewards shape is T x B
+        if self.shuffle:
+            rew_vec = rewards.flatten()
+            np.random.shuffle(rew_vec)
+            rewards = rew_vec.reshape(rewards.shape)
         return self.prediction_beta * rewards
 
     def compute_loss(self, observations, valid):

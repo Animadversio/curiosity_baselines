@@ -111,7 +111,7 @@ class PPO(PolicyGradientAlgo):
             )
             agent_curiosity_inputs = buffer_to(agent_curiosity_inputs, device=self.agent.device)
         # TODO: add our curiosity type, format the input to curiosity as a predefined `namedarraytuple` type. 
-        elif self.curiosity_type == 'random_reward':
+        elif self.curiosity_type in ['random_reward', 'random_reward_mov']:
             agent_curiosity_inputs = RndAgentCuriosityInputs(
                 next_observation=samples.env.next_observation.clone(),
                 valid=valid
@@ -184,7 +184,7 @@ class PPO(PolicyGradientAlgo):
                     opt_info.forward_loss.append(forward_loss.item())
                     opt_info.intrinsic_rewards.append(np.mean(self.intrinsic_rewards))
                 # TODO: add our curiosity type, and record curiosity loss in `opt_info` 
-                elif self.curiosity_type == 'random_reward':
+                elif self.curiosity_type in ['random_reward', 'random_reward_mov']:
                     # forward_loss = curiosity_losses
                     # opt_info.forward_loss.append(forward_loss.item())
                     opt_info.forward_loss.append(0)
@@ -263,7 +263,7 @@ class PPO(PolicyGradientAlgo):
             loss += forward_loss
             curiosity_losses = (forward_loss)
         # TODO: add our curiosity type, and compute loss for our curioisty module to learn. 
-        elif self.curiosity_type == 'random_reward':
+        elif self.curiosity_type in ['random_reward', 'random_reward_mov']:
             self.agent.curiosity_loss(self.curiosity_type, *agent_curiosity_inputs)
             curiosity_losses = None
         elif self.curiosity_type == 'count':

@@ -184,6 +184,7 @@ def start_experiment(args):
         model_args['curiosity_kwargs']['device'] = args.sample_mode
         model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
         model_args['curiosity_kwargs']['no_error'] = args.no_error
+        model_args['curiosity_kwargs']['shuffle'] = args.shuffle
     # TODO: add our curiosity type, add default parameters to our curiosity 
     elif args.curiosity_alg == 'random_reward':
         model_args['curiosity_kwargs']['feature_encoding'] = args.feature_encoding
@@ -194,6 +195,16 @@ def start_experiment(args):
         model_args['curiosity_kwargs']['nonneg'] = args.nonneg
         model_args['curiosity_kwargs']['use_distr'] = args.use_distr
         model_args['curiosity_kwargs']['zero_prob'] = args.zero_prob
+    elif args.curiosity_alg == 'random_reward_mov':
+        model_args['curiosity_kwargs']['feature_encoding'] = args.feature_encoding
+        model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale
+        model_args['curiosity_kwargs']['gamma'] = args.discount
+        model_args['curiosity_kwargs']['device'] = args.sample_mode
+        model_args['curiosity_kwargs']['batch_norm'] = args.batch_norm
+        model_args['curiosity_kwargs']['nonneg'] = args.nonneg
+        model_args['curiosity_kwargs']['mov_thresh'] = args.mov_thresh
+        model_args['curiosity_kwargs']['decay_timescale'] = args.decay_timescale
+        model_args['curiosity_kwargs']['update_freq'] = args.update_freq
     elif args.curiosity_alg == 'count':
         model_args['curiosity_kwargs']['hashfun'] = args.hashfun
         model_args['curiosity_kwargs']['reward_scale'] = args.reward_scale

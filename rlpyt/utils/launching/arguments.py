@@ -13,7 +13,7 @@ def get_args(args_in=sys.argv[1:]):
     # main args
     parser.add_argument('-alg', type=str, choices=['ppo', 'sac', 'a2c'], help='Which learning algorithm to run.')
     # TODO: add our curiosity type, add choices
-    parser.add_argument('-curiosity_alg', type=str, choices=['none', 'icm', 'disagreement', 'ndigo', 'rnd', 'random_reward', 'count'], help='Which intrinsic reward algorithm to use.')
+    parser.add_argument('-curiosity_alg', type=str, choices=['none', 'icm', 'disagreement', 'ndigo', 'rnd', 'random_reward', 'random_reward_mov', 'count'], help='Which intrinsic reward algorithm to use.')
     parser.add_argument('-env', type=str, help='Which environment to run on.')
     
     # general args
@@ -102,6 +102,7 @@ def get_args(args_in=sys.argv[1:]):
         parser.add_argument('-prediction_beta', default=1.0, type=float, help='Scalar multiplier applied to the prediction error to generate the intrinsic reward. Environment dependent.')
         parser.add_argument('-drop_probability', default=1.0, type=float, help='Decimal percent of experience to drop when training the predictor model.')
         parser.add_argument('-no_error', action='store_true', help="Whether or not to use a shallow distribution instead of deep net")
+        parser.add_argument('-shuffle', action='store_true', help="Whether or not to use a shallow distribution instead of deep net")
     # TODO: add our curiosity type, add command line interface extra arguments
     elif curiosity_alg == "random_reward":
         parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'], help='Which feature encoding method to use with RND.')
@@ -110,6 +111,18 @@ def get_args(args_in=sys.argv[1:]):
         parser.add_argument('-nonneg', default=0, type=bool, help='Random reward needs to be non negative.')
         parser.add_argument('-use_distr', action='store_true', help="Whether or not to use a shallow distribution instead of deep net")
         parser.add_argument('-zero_prob', default=0.5, type=float, help="prob of the intrinsic reward being zero. controls sparsity")
+    elif curiosity_alg == "random_reward_mov":
+        parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'],
+                            help='Which feature encoding method to use with RND.')
+        parser.add_argument('-batch_norm', action='store_true',
+                            help='Whether or not to use batch norm in the feature encoder.')
+        parser.add_argument('-nonneg', default=True, type=bool, help='Random reward needs to be non negative.')
+        parser.add_argument("-mov_thresh", default=0, type=bool)
+        parser.add_argument('-reward_scale', default=1.0, type=float,
+                            help='Scalar multiplier applied to the prediction error to generate the intrinsic reward. Environment dependent.')
+        parser.add_argument("-decay_timescale", default=200, type=int)
+        parser.add_argument("-update_freq", default=100, type=int)
+
     elif curiosity_alg == "count":
         parser.add_argument('-hashfun', default='SimHash', type=str, choices=['none', 'SimHash'], help='Which feature encoding method to use with RND.')
         parser.add_argument('-feature_encoding', default='none', type=str, choices=['none', 'idf_maze'], help='Which feature encoding method to use with RND.')
