@@ -43,7 +43,7 @@ python launch.py -env DeepmindMaze_goal-dddif-v0 -curiosity_alg rnd  -log_dir re
 python launch.py -env DeepmindMaze_goal-dddif-v0 -curiosity_alg rnd  -log_dir results/ppo_RND_DMMaze-dddif_dp05/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.5
 )
 
-FOR /L %i IN (2,1,4) DO (
+FOR /L %i IN (6,1,9) DO (
 python launch.py -env DeepmindMaze_goal-ddif-v0 -curiosity_alg rnd -shuffle -log_dir results/ppo_RNDShfl_DMMaze-ddif_dp01/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.1
 python launch.py -env DeepmindMaze_goal-ddif-v0 -curiosity_alg rnd -shuffle -log_dir results/ppo_RNDShfl_DMMaze-ddif_dp05/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.5
 python launch.py -env DeepmindMaze_goal-ddif-v0 -curiosity_alg rnd -shuffle -log_dir results/ppo_RNDShfl_DMMaze-ddif_dp095/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.95

@@ -23,5 +23,42 @@ python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward -use
 python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd -no_error -log_dir results_DMMaze/ppo_randDrift_DMMaze-dif_dp01/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.1 
 python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd -no_error -log_dir results_DMMaze/ppo_randDrift_DMMaze-dif_dp05/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.5 
 python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd -no_error -log_dir results_DMMaze/ppo_randDrift_DMMaze-dif_dp09/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.9
+python launch.py -env Maze-Lv1-v0 -curiosity_alg random_reward  -log_dir results/ppo_randrew_MazeLv1_r10/run_0 -feature_encoding idf_maze %common_param% 
 )
 
+
+FOR /L %i IN (3,1,6) DO (
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd  -log_dir results_DMMaze/ppo_RND_DMMaze-dif_dp10/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 1.0
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward -log_dir results_DMMaze/ppo_randrew_DMMaze-dif/run_%i -feature_encoding idf_maze %common_param% -reward_scale 1.0
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward -log_dir results_DMMaze/ppo_randrew_DMMaze-dif_nonneg/run_%i -feature_encoding idf_maze %common_param% -nonneg 1 -reward_scale 1.0
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward -log_dir results_DMMaze/ppo_randrew_DMMaze-dif_nonneg_r5/run_%i -feature_encoding idf_maze %common_param% -nonneg 1 -reward_scale 5.0
+)
+
+
+FOR /L %i IN (4,1,7) DO (
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT100UF100RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 100 -update_freq 100 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT100UF40RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 100 -update_freq 40 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT40UF100RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 20 -update_freq 100 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT40UF40RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 40 -update_freq 40 %common_param% 
+)
+
+FOR /L %i IN (6,1,8) DO (
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd  -log_dir results_DMMaze/ppo_RND_DMMaze-dif_dp00/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.0
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd -shuffle -log_dir results_DMMaze/ppo_RNDShfl_DMMaze-dif_dp095/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.95
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd -shuffle -log_dir results_DMMaze/ppo_RNDShfl_DMMaze-dif_dp10/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 1.0
+)
+FOR /L %i IN (9,1,11) DO (
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd  -log_dir results_DMMaze/ppo_RND_DMMaze-dif_dp00/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.0
+)
+FOR /L %i IN (6,1,9) DO (
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg rnd -shuffle -log_dir results_DMMaze/ppo_RNDShfl_DMMaze-dif_dp00/run_%i -feature_encoding none %common_param% -prediction_beta 1.0 -drop_probability 0.0
+)
+
+FOR /L %i IN (6,1,9) DO (
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT100UF5RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 100 -update_freq 5 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT100UF500RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 100 -update_freq 500 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT100UF500/run_%i -feature_encoding idf_maze -nonneg 1 -decay_timescale 100 -update_freq 500 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT100UF100_negRS1/run_%i -feature_encoding idf_maze -reward_scale 1 -decay_timescale 100 -update_freq 100 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT500UF100/run_%i -feature_encoding idf_maze -nonneg 1 -decay_timescale 500 -update_freq 100 %common_param% 
+python launch.py -env DeepmindMaze_goal-dif-v0 -curiosity_alg random_reward_mov -log_dir results_DMMaze/ppo_randrewmov_DMMaze-dif-DT500UF100RS1/run_%i -feature_encoding idf_maze -nonneg 1 -reward_scale 1 -decay_timescale 500 -update_freq 100 %common_param% 
+)
